@@ -46,13 +46,6 @@ paths:
       description: Member
       tags: 
         - Members 
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: 
-            type: integer
-            example: 4
       requestBody: 
         required: true
         content:
