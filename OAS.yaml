@@ -43,7 +43,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   /members: 
     post:
-      description: Member
+      description: Member inscription
       tags: 
         - Members 
       requestBody: 
