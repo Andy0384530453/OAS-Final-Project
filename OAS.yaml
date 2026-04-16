@@ -41,7 +41,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /collectivities/{id}/members: 
+  /members: 
     post:
       description: Member
       tags: 
@@ -52,6 +52,7 @@ paths:
           required: true
           schema: 
             type: integer
+            example: 4
       requestBody: 
         required: true
         content:
@@ -76,6 +77,7 @@ paths:
                 occupation: collector
                 phone: +261 34 12 345 67
                 email: rivo.andria@example.mg
+                collectivityId: 3
               Transaction:
                 references: PAR-MDG-20260416-089
                 amount: 500000
@@ -107,6 +109,7 @@ paths:
                   occupation: teacher
                   phone: +261 34 12 345 67
                   email: rivo.andria@example.mg
+                  collectivityId: 3
                 Transaction:
                   references: PAR-MDG-20260416-089
                   amount: 500000
@@ -133,35 +136,99 @@ paths:
                 message: Your profile does not meet the requirements for membership
                 status: 403
   /members/{id}:
-     put:
-        description: Change Member informations or collective
-        tags: 
-          - Members
-        parameters:
-         - name: id 
-           in: path
-           required: true
-           schema: 
-            type: integer
-        requestBody:
+    put:
+      description: Change Member informations or collective
+      tags: 
+        - Members
+      parameters:
+        - name: id 
+          in: path
           required: true
-          content:
+          schema: 
+            type: integer
+            example: 17
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Members"
+            example: 
+              id: 17
+              name: Miora Faniry Razafimahatratra
+              birthdate: 1992-03-18
+              gender: female
+              address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
+              occupation: collector
+              phone: +261 32 98 765 43
+              email: miora.faniry@example.mg
+              collectivityId: 12
+
+      responses: 
+        '200':
+          description: Member information updated
+          content: 
             application/json:
               schema: 
                 $ref: "#/components/schemas/Members"
-        responses: 
-          '200':
-            description: Member information updated
-            content: 
-              application/json:
-                schema: 
-                  $ref: "#/components/schemas/Members"
-          '404':
-            description: Member is not found
-            content: 
-              application/json:
-                schema: 
-                  $ref: "#/components/schemas/Error"
+              example: 
+                id: 17
+                name: Miora Faniry Razafimahatratra
+                birthdate: 1992-03-18
+                gender: female
+                address: Lot VA 15 Ter,   Andoharanofotsy, Antananarivo 102
+                occupation: collector
+                phone: +261 32 98 765 43
+                email: miora.faniry@example.mg
+                collectivityId: 12
+
+        '404':
+          description: Member not found
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: The member from id={id} is not found
+                status: 400
+    delete: 
+      tags:
+       - Members
+      description: Do you want to leave 
+      parameters: 
+        - name : id
+          in: path
+          required: true
+          schema: 
+            type: integer
+            example: 17
+      responses: 
+        '200': 
+          description: You left 
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Members"
+              example: 
+                id: 17
+                name: Miora Faniry Razafimahatratra
+                birthdate: 1992-03-18
+                gender: female
+                address: Lot VA 15 Ter,   Andoharanofotsy, Antananarivo 102
+                occupation: collector
+                phone: +261 32 98 765 43
+                email: miora.faniry@example.mg
+                collectivityId: 12
+        '400':
+          description: Member not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Members"
+              example: 
+                message: The member from id={id} is not found
+                status: 400
+
 
 components:
   schemas:
@@ -179,6 +246,8 @@ components:
         creationDateTime:
           type: string
           format: date-time
+        collectivityId: 
+          type: integer
     Members:
       type: object
       properties:
