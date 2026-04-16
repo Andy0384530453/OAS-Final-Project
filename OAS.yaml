@@ -43,9 +43,9 @@ paths:
                 $ref: '#/components/schemas/Error'
   /collectivities/{id}/members: 
     post:
-      description: Add new member
+      description: Member
       tags: 
-        - New Members 
+        - Members 
       parameters:
         - name: id
           in: path
@@ -59,14 +59,29 @@ paths:
             schema:
               type : object
               properties:
-                Sponsors: 
-                  properties:
-                    sponsorId:
-                      type: integer
+                sponsorId:
+                  type: integer
                 NewMemberInformations: 
                   $ref: "#/components/schemas/Members"
                 Transaction: 
                   $ref: "#/components/schemas/Transaction"
+            example:
+              sponsorId: 12
+              NewMemberInformation: 
+                id: 134
+                name: Rivo Andrianantenaina
+                birthdate: 1988-11-02
+                gender: male
+                address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
+                occupation: collector
+                phone: +261 34 12 345 67
+                email: rivo.andria@example.mg
+              Transaction:
+                references: PAR-MDG-20260416-089
+                amount: 500000
+                payment: Orange_money
+                status: success
+                transactionDate: 2026-04-16T09:15:22.123Z
       responses: 
         '201':
           description: Welcome to our collectivity
@@ -75,14 +90,29 @@ paths:
               schema: 
                 type: object
                 properties: 
-                  Sponsors: 
-                    properties:
-                      sponsorId:
-                        type: integer
+                  sponsorId:
+                    type: integer
                   NewMemberInformations: 
                     $ref: "#/components/schemas/Members"
                   Transaction: 
                     $ref: "#/components/schemas/Transaction"
+              example:
+                sponsorId: 12
+                NewMemberInformation: 
+                  id: 134
+                  name: Rivo Andrianantenaina
+                  birthdate: 1988-11-02
+                  gender: male
+                  address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
+                  occupation: teacher
+                  phone: +261 34 12 345 67
+                  email: rivo.andria@example.mg
+                Transaction:
+                  references: PAR-MDG-20260416-089
+                  amount: 500000
+                  payment: Orange_money
+                  status: success
+                  transactionDate: 2026-04-16T09:15:22.123Z
                        
         '400': 
           description: Information incomplete
@@ -102,6 +132,36 @@ paths:
               example: 
                 message: Your profile does not meet the requirements for membership
                 status: 403
+  /members/{id}:
+     put:
+        description: Change Member informations or collective
+        tags: 
+          - Members
+        parameters:
+         - name: id 
+           in: path
+           required: true
+           schema: 
+            type: integer
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Members"
+        responses: 
+          '200':
+            description: Member information updated
+            content: 
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/Members"
+          '404':
+            description: Member is not found
+            content: 
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/Error"
 
 components:
   schemas:
