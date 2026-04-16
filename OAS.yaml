@@ -26,6 +26,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collectivities'
+                
 
         '400':
           description: Collectivity creation not satisfied
@@ -40,15 +41,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /collectivities/members: 
+  /collectivities/{id}/members: 
     post:
-      description: Add new member 
+      description: Add new member
+      tags: 
+        - New Members 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
       requestBody: 
         required: true
         content:
           application/json: 
             schema:
-              $ref: "#/components/schemas/Members"
+              type : object
+              properties:
+                NewMemberInformations: 
+                  $ref: "#/components/schemas/Members"
+                Transaction: 
+                  $ref: "#/components/schemas/Transaction"
       responses: 
         '201':
           description: Welcome to our collectivity
@@ -60,7 +74,7 @@ paths:
                 $ref: "#/components/schemas/Error"
               example: 
                 message: You must complete all the informations about the new member
-                code: 400
+                status: 400
         '403':
           description: Admission not authorized 
           content: 
@@ -69,7 +83,7 @@ paths:
                 $ref: "#/components/schemas/Error"
               example: 
                 message: Your profile does not meet the requirements for membership
-                code: 403
+                status: 403
 
 components:
   schemas:
@@ -103,7 +117,7 @@ components:
           enum: 
             - male
             - female
-        adress: 
+        address: 
           type: string
         occupation: 
           type: string
@@ -111,7 +125,30 @@ components:
           type: string
         email: 
           type: string
-          format: email    
+          format: email 
+        sponsortId: 
+          type: integer
+    Transaction: 
+      required:
+        - references
+        - amount
+        - status
+      type: object
+      properties:
+        references: 
+          type: string
+        amount:
+          type: number
+        payment: 
+          type: string
+        status: 
+          type: string
+          enum: 
+            - SUCCESS
+            - FAILURE
+        transactionDate: 
+          type: string
+          format: date-time   
 
     Error:
       type: object
