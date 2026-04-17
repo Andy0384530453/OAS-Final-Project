@@ -41,8 +41,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /members: 
+  /collectivities/{id}/members: 
     post:
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+        example: 12
       description: Member inscription
       tags: 
         - Members 
@@ -73,7 +80,7 @@ paths:
                 collectivityId: 3
               Transaction:
                 references: PAR-MDG-20260416-089
-                amount: 500000
+                amount: 50000
                 payment: Orange_money
                 status: success
                 transactionDate: 2026-04-16T09:15:22.123Z
@@ -105,7 +112,7 @@ paths:
                   collectivityId: 3
                 Transaction:
                   references: PAR-MDG-20260416-089
-                  amount: 500000
+                  amount: 50000
                   payment: Orange_money
                   status: success
                   transactionDate: 2026-04-16T09:15:22.123Z
@@ -128,7 +135,7 @@ paths:
               example: 
                 message: Your profile does not meet the requirements for membership
                 status: 403
-  /members/{id}:
+  /members:
     put:
       description: Change Member informations or collective
       tags: 
@@ -155,7 +162,7 @@ paths:
               occupation: collector
               phone: +261 32 98 765 43
               email: miora.faniry@example.mg
-              collectivityId: 12
+             
 
       responses: 
         '200':
@@ -173,7 +180,7 @@ paths:
                 occupation: collector
                 phone: +261 32 98 765 43
                 email: miora.faniry@example.mg
-                collectivityId: 12
+               
 
         '404':
           description: Member not found
@@ -183,7 +190,7 @@ paths:
                 $ref: "#/components/schemas/Error"
               example: 
                 message: The member from id={id} is not found
-                status: 400
+                status: 404
     delete: 
       tags:
        - Members
@@ -211,13 +218,13 @@ paths:
                 occupation: collector
                 phone: +261 32 98 765 43
                 email: miora.faniry@example.mg
-                collectivityId: 12
+            
         '400':
           description: Member not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Members"
+                $ref: "#/components/schemas/Error"
               example: 
                 message: The member from id={id} is not found
                 status: 400
@@ -239,14 +246,12 @@ components:
         creationDateTime:
           type: string
           format: date-time
-        collectivityId: 
-          type: integer
+        
     Members:
       type: object
       properties:
         id: 
           type: integer
-          format: byte64
         name: 
           type: string
         birthdate: 
@@ -265,7 +270,41 @@ components:
           type: string
         email: 
           type: string
-          format: email 
+          format: email
+    Positions:
+      type: string
+      enum: 
+          - PRESIDENT
+          - VICE PRESIDENT 
+          - TREASURER 
+          - SECREATARY
+          - SENIOR_MEMBER
+          - JUNIOR_MEMBER
+    Mandate: 
+      type: object
+      required: 
+        - id
+        - collectivityId
+        - memberId
+        - position
+        - startDate
+        - endDate
+      properties: 
+        id: 
+          type: integer
+        collectivityId: 
+          type: integer
+        memberId: 
+          type: integer
+        position: 
+          $ref: "#/components/schemas/Positions"
+        startDate: 
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+       
     Transaction: 
       required:
         - references
