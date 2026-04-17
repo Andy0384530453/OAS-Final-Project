@@ -240,6 +240,12 @@ paths:
   /collectivities/{id}/contribution: 
     post: 
       description: You will Pay your contribution
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
       tags: 
         - Contribution
       requestBody:
@@ -283,6 +289,16 @@ paths:
                   payment: ORANGE_MONEY
                   status: SUCCESS
                   transactionDate: 2026-04-17T07:30:34.267Z
+        '400':
+          description: collectivity not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: The collectivity from id={id} is not found
+                status: 400
+           
     get:
       description: The note about the contribution
       tags: 
@@ -314,7 +330,62 @@ paths:
                   payment: ORANGE_MONEY
                   status: SUCCESS
                   transactionDate: 2026-04-17T07:30:34.267Z
+        '400':
+          description: collectivity not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: The collectivity from id={id} is not found
+                status: 400
+  /collectivities/{id}/contribution/federationTransfer:
+    post:
+      description: Transfer of the contribution to the federation
+      tags: 
+        - Contribution
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
+      requestBody:
+        content:
+          application/json: 
+            schema: 
+              properties:
+                period: 
+                  type: string
+                transfertConfirm: 
+                   type: boolean
 
+      responses: 
+        '200':
+          description: Transfer succeed
+          content: 
+            application/json: 
+              schema: 
+                properties:
+                  transferredAmount: 
+                    type: number
+                  contributionCount: 
+                    type: integer
+                  transfertDate:
+                    type: string
+                    format: date-time
+                  contribution: 
+                   $ref: "#/components/schemas/Contribution"
+                example:
+                  transferredAmount: 10000
+                  contributionsCount: 5
+                  transferDate: "2026-04-30T23:59:59Z"
+                  transaction:
+                    references: "FED-TRF-20260430-001"
+                    amount: 10000
+                    payment: "BANK_TRANSFER"
+                    status: "SUCCESS"
+                    transactionDate: "2026-04-30T23:59:59Z"
 
 components:
   schemas:
@@ -331,8 +402,7 @@ components:
           type: string
         creationDateTime:
           type: string
-          format: date-time
-        
+          format: date-time        
     Members:
       type: object
       properties:
@@ -359,7 +429,6 @@ components:
           format: email
         collectivityId: 
           type: integer
-
     Positions:
       type: string
       enum: 
@@ -389,12 +458,37 @@ components:
           $ref: "#/components/schemas/Positions"
         startDate: 
           type: string
-          format: date-time
+          format: date
         endDate:
           type: string
-          format: date-time
+          format: date
+    Federation: 
+      required:
+        - id
+        - federationPresident
+        - federationVicePresident
+        - federationSecretary
+        - frederationTreasurer
+        - mandateStartDate
+        - mandateEndDate
+      properties: 
+        id : 
+          type: integer
+        federationPresident: 
+          $ref: "#/components/schemas/Members"
+        federationVicePresident:
+          $ref: "#/components/schemas/Members"
+        federationSecretary: 
+          $ref: "#/components/schemas/Members"
+        federationTreasurer: 
+          $ref: "#/components/schemas/Members"
+        mandateStartDate: 
+          type: string
+          format: date
+        mandateEndDate: 
+          type: string
+          format: date
 
-       
     Transaction: 
       required:
         - references
