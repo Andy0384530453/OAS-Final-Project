@@ -135,7 +135,7 @@ paths:
               example: 
                 message: Your profile does not meet the requirements for membership
                 status: 403
-  /members:
+  /members/{id}:
     put:
       description: Change Member informations or collective
       tags: 
@@ -162,7 +162,7 @@ paths:
               occupation: collector
               phone: +261 32 98 765 43
               email: miora.faniry@example.mg
-             
+              collectivityId: 3
 
       responses: 
         '200':
@@ -180,6 +180,7 @@ paths:
                 occupation: collector
                 phone: +261 32 98 765 43
                 email: miora.faniry@example.mg
+                collectivityId: 3
                
 
         '404':
@@ -271,6 +272,9 @@ components:
         email: 
           type: string
           format: email
+        collectivityId: 
+          type: integer
+
     Positions:
       type: string
       enum: 
@@ -304,6 +308,7 @@ components:
         endDate:
           type: string
           format: date-time
+
        
     Transaction: 
       required:
