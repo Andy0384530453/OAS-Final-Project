@@ -235,7 +235,23 @@ paths:
               example: 
                 message: The member from id={id} is not found
                 status: 400
-
+  /contribution/: 
+    post: 
+      description: You will Pay your contribution
+      requestBody:
+        required: true
+        content: 
+           application/json:
+              schema: 
+                $ref: "#/components/schemas/Contribution"
+      responses:
+        '200':
+          description: Your contribution is payed
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Contribution"
+      
 
 components:
   schemas:
@@ -336,7 +352,37 @@ components:
             - FAILURE
         transactionDate: 
           type: string
-          format: date-time   
+          format: date-time 
+    Contribution:
+      type: object
+      properties:
+        id: 
+          type: integer
+        memberId: 
+          type: integer
+        collectivityId:
+           type: integer
+        period: 
+           type: string
+           format: date
+        contributionPeriod: 
+          type: string
+          enum: 
+            - MONTHLY
+            - YEARLY
+            - ONE_TIME
+        nature: 
+          type: string
+          enum:
+            - REGULAR
+            - SPECIAL_EVENT
+            - EMERGENCY
+        receiptNumber: 
+          type: string
+        collectedBy:
+          type: integer
+        transaction: 
+          $ref: "#/components/schemas/Transaction"  
     Error:
       type: object
       properties:
