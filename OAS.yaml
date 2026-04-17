@@ -11,7 +11,8 @@ paths:
     post: 
       description: Create a new collectivity
       operationId: newCollectivities
-
+      tags: 
+        - Collectivity
       requestBody:
         required: true
         content:
@@ -235,15 +236,32 @@ paths:
               example: 
                 message: The member from id={id} is not found
                 status: 400
-  /contribution/: 
+
+  /collectivities/{id}/contribution: 
     post: 
       description: You will Pay your contribution
+      tags: 
+        - Contribution
       requestBody:
         required: true
         content: 
            application/json:
               schema: 
                 $ref: "#/components/schemas/Contribution"
+              example:
+                memberId: 134
+                collectivityId: 4
+                period: 2026-04
+                contributionPeriod: MONTHLY
+                nature: REGULAR
+                receiptNumber: REC-20260417-001
+                collectedBy: 42
+                transaction: 
+                  references: CONT-20260417-089
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: 2026-04-17T07:30:34.267Z
       responses:
         '200':
           description: Your contribution is payed
@@ -251,7 +269,52 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/Contribution"
-      
+              example:
+                memberId: 134
+                collectivityId: 4
+                period: 2026-04
+                contributionPeriod: MONTHLY
+                nature: REGULAR
+                receiptNumber: REC-20260417-001
+                collectedBy: 42
+                transaction: 
+                  references: CONT-20260417-089
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: 2026-04-17T07:30:34.267Z
+    get:
+      description: The note about the contribution
+      tags: 
+        - Contribution 
+      parameters:
+        - name: id
+          in: path 
+          required: true
+          schema: 
+            type: integer
+      responses:
+        '200': 
+          description: This is the note about the contibution from the member number {memberId}
+          content: 
+            application: 
+              schema: 
+                 $ref: "#/components/schemas/Collectivities"
+              example:
+                memberId: 134
+                collectivityId: 4
+                period: 2026-04
+                contributionPeriod: MONTHLY
+                nature: REGULAR
+                receiptNumber: REC-20260417-001
+                collectedBy: 42
+                transaction: 
+                  references: CONT-20260417-089
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: 2026-04-17T07:30:34.267Z
+
 
 components:
   schemas:
@@ -364,13 +427,12 @@ components:
            type: integer
         period: 
            type: string
-           format: date
+
         contributionPeriod: 
           type: string
           enum: 
             - MONTHLY
             - YEARLY
-            - ONE_TIME
         nature: 
           type: string
           enum:
