@@ -34,6 +34,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example: 
+                message: You must complete the informations about the collectivity
+                status: 404
 
         '403':
           description: Collectivity creation not authorized
@@ -41,6 +44,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example: 
+                message: The new Collectivity need to follow all the requirement
+                
   /collectivities/{id}/members: 
     post:
       parameters:
