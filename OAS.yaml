@@ -36,7 +36,7 @@ paths:
                 $ref: '#/components/schemas/Error'
               example: 
                 message: You must complete the informations about the collectivity
-                status: 404
+                status: 400
 
         '403':
           description: Collectivity creation not authorized
@@ -51,7 +51,7 @@ paths:
     post:
       parameters:
       - name: id
-        in: query
+        in: path
         required: true
         schema:
           type: integer
@@ -68,7 +68,7 @@ paths:
               properties:
                 sponsorId:
                   type: integer
-                NewMemberInformations: 
+                NewMemberInformation: 
                   $ref: "#/components/schemas/Members"
                 Transaction: 
                   $ref: "#/components/schemas/Transaction"
@@ -236,9 +236,80 @@ paths:
                 message: The member from id={id} is not found
                 status: 400
 
+  /collectivities/{id}/accounts:
+    post:
+      description: add treasury account
+      operationId: createCollectivityAccount
+
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: 
+          type: integer
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+
+      responses:
+        '201':
+          description: account created 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+
+        '404':
+          description: Collectivity.id={id} is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Collectivity.id=19 is not found
+                status: 404
+        
+
+        
+
+      
+    get:
+      description: get account 
+      operationId: getCollectivityAccounts 
+      
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: 
+          type: integer 
+
+      responses:
+        '200':
+          description: find account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        
+        '404':
+          description: Collectivity.id={id} is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Collectivity.id=19 is not found
+                status: 404
+
 
 components:
   schemas:
+
     Collectivities:
       type: object
       properties:
@@ -344,3 +415,47 @@ components:
           type: string
         status:
           type: integer
+
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+        typeAccount:
+          type: string
+          enum: ["BRED", "MCB", "BMOI", "BOA", "BGFI", "AFG", "ACCÈS BANQUE", "BAOBAB", "SIPEM"]
+        titulaireName: 
+          type: string
+        accountDetail:
+          $ref: '#/components/schemas/AccountDetail'
+
+    AccountDetail:    
+      type: object
+      properties:
+        bankCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+        boxCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+        accountNumber:
+          type: string
+          minLength: 11
+          maxLength: 11
+        RIBkey:
+          type: string
+          minLength: 2
+          maxLength: 2
+    
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+  
+        
+                  
