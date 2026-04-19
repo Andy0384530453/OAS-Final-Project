@@ -390,6 +390,70 @@ paths:
                     payment: "BANK_TRANSFER"
                     status: "SUCCESS"
                     transactionDate: "2026-04-30T23:59:59Z"
+  /collectivities/{id}/accounts:
+    post:
+      description: add treasury account
+      operationId: createCollectivityAccount
+
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: 
+          type: integer
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+
+      responses:
+        '201':
+          description: account created 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+
+        '404':
+          description: Collectivity.id={id} is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Collectivity.id=19 is not found
+                status: 404
+    get:
+      description: get account 
+      operationId: getCollectivityAccounts 
+      
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: 
+          type: integer 
+
+      responses:
+        '200':
+          description: find account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        
+        '404':
+          description: Collectivity.id={id} is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Collectivity.id=19 is not found
+                status: 404
   
 
 components:
@@ -558,6 +622,37 @@ components:
           type: number
         transferredToFederation:
           type: boolean
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+        typeAccount:
+          type: string
+          enum: ["BRED", "MCB", "BMOI", "BOA", "BGFI", "AFG", "ACCÈS BANQUE", "BAOBAB", "SIPEM"]
+        titulaireName: 
+          type: string
+        accountDetail:
+          $ref: '#/components/schemas/AccountDetail'
+    AccountDetail:    
+      type: object
+      properties:
+        bankCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+        boxCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+        accountNumber:
+          type: string
+          minLength: 11
+          maxLength: 11
+        RIBkey:
+          type: string
+          minLength: 2
+          maxLength: 2
     Error:
       type: object
       properties:
