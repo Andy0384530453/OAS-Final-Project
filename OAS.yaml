@@ -11,7 +11,8 @@ paths:
     post: 
       description: Create a new collectivity
       operationId: newCollectivities
-
+      tags: 
+        - Collectivity
       requestBody:
         required: true
         content:
@@ -68,13 +69,13 @@ paths:
               properties:
                 sponsorId:
                   type: integer
-                NewMemberInformation: 
+                NewMemberInformations: 
                   $ref: "#/components/schemas/Members"
                 Transaction: 
                   $ref: "#/components/schemas/Transaction"
             example:
               sponsorId: 12
-              NewMemberInformation: 
+              NewMemberInformations: 
                 id: 134
                 name: Rivo Andrianantenaina
                 birthdate: 1988-11-02
@@ -106,7 +107,7 @@ paths:
                     $ref: "#/components/schemas/Transaction"
               example:
                 sponsorId: 12
-                NewMemberInformation: 
+                NewMemberInformations: 
                   id: 134
                   name: Rivo Andrianantenaina
                   birthdate: 1988-11-02
@@ -120,7 +121,7 @@ paths:
                   references: PAR-MDG-20260416-089
                   amount: 50000
                   payment: Orange_money
-                  status: success
+                  status: SUCCESS
                   transactionDate: 2026-04-16T09:15:22.123Z
                        
         '400': 
@@ -226,7 +227,7 @@ paths:
                 phone: +261 32 98 765 43
                 email: miora.faniry@example.mg
             
-        '400':
+        '404':
           description: Member not found
           content:
             application/json:
@@ -234,82 +235,165 @@ paths:
                 $ref: "#/components/schemas/Error"
               example: 
                 message: The member from id={id} is not found
-                status: 400
-
-  /collectivities/{id}/accounts:
-    post:
-      description: add treasury account
-      operationId: createCollectivityAccount
-
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema: 
-          type: integer
-      
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Account'
-        required: true
-
-      responses:
-        '201':
-          description: account created 
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Account'
-
-        '404':
-          description: Collectivity.id={id} is not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                message: Collectivity.id=19 is not found
                 status: 404
-        
 
-        
-
-      
-    get:
-      description: get account 
-      operationId: getCollectivityAccounts 
-      
+  /collectivities/{id}/contribution: 
+    post: 
+      description: You will Pay your contribution
       parameters:
-      - name: id
-        in: path
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
+      tags: 
+        - Contribution
+      requestBody:
         required: true
-        schema: 
-          type: integer 
-
+        content: 
+           application/json:
+              schema: 
+                $ref: "#/components/schemas/Contribution"
+              example:
+                memberId: 134
+                collectivityId: 4
+                period: 2026-04
+                contributionPeriod: MONTHLY
+                nature: REGULAR
+                receiptNumber: REC-20260417-001
+                collectedBy: 42
+                transaction: 
+                  references: CONT-20260417-089
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: 2026-04-17T07:30:34.267Z
       responses:
         '200':
-          description: find account
-          content:
+          description: Your contribution is payed
+          content: 
             application/json:
-              schema:
-                $ref: '#/components/schemas/Account'
-        
-        '404':
-          description: Collectivity.id={id} is not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              schema: 
+                $ref: "#/components/schemas/Contribution"
               example:
-                message: Collectivity.id=19 is not found
-                status: 404
+                memberId: 134
+                collectivityId: 4
+                period: 2026-04
+                contributionPeriod: MONTHLY
+                nature: REGULAR
+                receiptNumber: REC-20260417-001
+                collectedBy: 42
+                transaction: 
+                  references: CONT-20260417-089
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: 2026-04-17T07:30:34.267Z
 
+        '400':
+          description: collectivity not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: The collectivity from id={id} is not found
+                status: 400
+           
+    get:
+      description: The note about the contribution
+      tags: 
+        - Contribution 
+      parameters:
+        - name: id
+          in: path 
+          required: true
+          schema: 
+            type: integer
+      responses:
+        '200': 
+          description: This is the note about the contribution from the member number {memberId}
+          content: 
+            application/json: 
+              schema: 
+                 $ref: "#/components/schemas/Contribution"
+              example:
+                memberId: 134
+                collectivityId: 4
+                period: 2026-04
+                contributionPeriod: MONTHLY
+                nature: REGULAR
+                receiptNumber: REC-20260417-001
+                collectedBy: 42
+                transaction: 
+                  references: CONT-20260417-089
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: 2026-04-17T07:30:34.267Z
+                federationShare: 4000
+                transferredToFederation: true
+              
+        '400':
+          description: collectivity not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: The collectivity from id={id} is not found
+                status: 400
+  /collectivities/{id}/contribution/federationTransfer:
+    post:
+      description: Transfer of the contribution to the federation
+      tags: 
+        - Contribution
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
+      requestBody:
+        content:
+          application/json: 
+            schema: 
+              properties:
+                period: 
+                  type: string
+                transfertConfirm: 
+                   type: boolean
+
+      responses: 
+        '200':
+          description: Transfer succeed
+          content: 
+            application/json: 
+              schema: 
+                properties:
+                  transferredAmount: 
+                    type: number
+                  contributionCount: 
+                    type: integer
+                  transfertDate:
+                    type: string
+                    format: date-time
+                  transaction: 
+                    $ref: "#/components/schemas/Transaction"
+                example:
+                  transferredAmount: 10000
+                  contributionsCount: 5
+                  transferDate: "2026-04-30T23:59:59Z"
+                  transaction:
+                    references: "FED-TRF-20260430-001"
+                    amount: 10000
+                    payment: "BANK_TRANSFER"
+                    status: "SUCCESS"
+                    transactionDate: "2026-04-30T23:59:59Z"
+  
 
 components:
   schemas:
-
     Collectivities:
       type: object
       properties:
@@ -323,10 +407,19 @@ components:
           type: string
         creationDateTime:
           type: string
-          format: date-time
-        
+          format: date-time        
     Members:
       type: object
+      required:
+        - id
+        - name
+        - birthdate
+        - gender
+        - address
+        - occupation
+        - phone
+        - email
+        - collectivityId
       properties:
         id: 
           type: integer
@@ -351,14 +444,13 @@ components:
           format: email
         collectivityId: 
           type: integer
-
     Positions:
       type: string
       enum: 
           - PRESIDENT
           - VICE PRESIDENT 
           - TREASURER 
-          - SECREATARY
+          - SECRETARY
           - SENIOR_MEMBER
           - JUNIOR_MEMBER
     Mandate: 
@@ -381,12 +473,37 @@ components:
           $ref: "#/components/schemas/Positions"
         startDate: 
           type: string
-          format: date-time
+          format: date
         endDate:
           type: string
-          format: date-time
+          format: date
+    Federation: 
+      required:
+        - id
+        - federationPresident
+        - federationVicePresident
+        - federationSecretary
+        - federationTreasurer
+        - mandateStartDate
+        - mandateEndDate
+      properties: 
+        id : 
+          type: integer
+        federationPresident: 
+          $ref: "#/components/schemas/Members"
+        federationVicePresident:
+          $ref: "#/components/schemas/Members"
+        federationSecretary: 
+          $ref: "#/components/schemas/Members"
+        federationTreasurer: 
+          $ref: "#/components/schemas/Members"
+        mandateStartDate: 
+          type: string
+          format: date
+        mandateEndDate: 
+          type: string
+          format: date
 
-       
     Transaction: 
       required:
         - references
@@ -407,7 +524,40 @@ components:
             - FAILURE
         transactionDate: 
           type: string
-          format: date-time   
+          format: date-time 
+    Contribution:
+      type: object
+      properties:
+        id: 
+          type: integer
+        memberId: 
+          type: integer
+        collectivityId:
+           type: integer
+        period: 
+           type: string
+
+        contributionPeriod: 
+          type: string
+          enum: 
+            - MONTHLY
+            - YEARLY
+        nature: 
+          type: string
+          enum:
+            - REGULAR
+            - SPECIAL_EVENT
+            - EMERGENCY
+        receiptNumber: 
+          type: string
+        collectedBy:
+          type: integer
+        transaction: 
+          $ref: "#/components/schemas/Transaction"  
+        federationShare:
+          type: number
+        transferredToFederation:
+          type: boolean
     Error:
       type: object
       properties:
@@ -415,47 +565,3 @@ components:
           type: string
         status:
           type: integer
-
-    Account:
-      type: object
-      properties:
-        id:
-          type: integer
-        typeAccount:
-          type: string
-          enum: ["BRED", "MCB", "BMOI", "BOA", "BGFI", "AFG", "ACCÈS BANQUE", "BAOBAB", "SIPEM"]
-        titulaireName: 
-          type: string
-        accountDetail:
-          $ref: '#/components/schemas/AccountDetail'
-
-    AccountDetail:    
-      type: object
-      properties:
-        bankCode:
-          type: string
-          minLength: 5
-          maxLength: 5
-        boxCode:
-          type: string
-          minLength: 5
-          maxLength: 5
-        accountNumber:
-          type: string
-          minLength: 11
-          maxLength: 11
-        RIBkey:
-          type: string
-          minLength: 2
-          maxLength: 2
-    
-    Error:
-      type: object
-      properties:
-        message:
-          type: string
-        status:
-          type: integer
-  
-        
-                  
