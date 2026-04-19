@@ -444,7 +444,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-        
         '404':
           description: Collectivity.id={id} is not found
           content:
@@ -454,8 +453,21 @@ paths:
               example:
                 message: Collectivity.id=19 is not found
                 status: 404
-  
+  /collectivities/{id}/activities:
+    post: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: string
+      requestBody:
+      responses:
+        '200':
+            description: New activity added
 
+          
+  
 components:
   schemas:
     Collectivities:
@@ -653,6 +665,29 @@ components:
           type: string
           minLength: 2
           maxLength: 2
+    Activity: 
+      type: object
+      required: 
+        - title
+        - date
+        - presence
+        - members
+      properties: 
+        title: 
+          type: string
+        date: 
+          type: string
+        presence: 
+          type: string
+          enum: 
+            - OBLIGATORY
+            - OPTIONAL
+        members:
+          type: string
+          enum:
+            - SENIOR_MEMBER
+            - JUNIOR_MEMBER
+            - ALL
     Error:
       type: object
       properties:
