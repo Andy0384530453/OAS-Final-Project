@@ -291,7 +291,7 @@ paths:
                   transactionDate: 2026-04-17T07:30:34.267Z
 
         '400':
-          description: collectivity not found
+          description: The collectivity from id={id} is not found
           content:
             application/json:
               schema: 
@@ -335,7 +335,7 @@ paths:
                 transferredToFederation: true
               
         '400':
-          description: collectivity not found
+          description: The collectivity from id={id} is not found
           content:
             application/json:
               schema: 
@@ -343,7 +343,7 @@ paths:
               example: 
                 message: The collectivity from id={id} is not found
                 status: 400
-  /collectivities/{id}/contribution/federationTransfer:
+  /collectivities/{id}/contribution/federation:
     post:
       description: Transfer of the contribution to the federation
       tags: 
@@ -462,12 +462,56 @@ paths:
           schema: 
             type: string
       requestBody:
+        content:
+          application/json:
+            schema:
+               $ref: "#/components/schemas/Activity"
       responses:
         '200':
             description: New activity added
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/Activity"
+        '400': 
+            description: The collectivity from id={id} is not found
+            content: 
+              application/json: 
+                schema: 
+                  $ref: "#/components/schemas/Error"
+                example:
+                  message: The collectivity from id=909 is not found
+                  status: 400
 
-          
-  
+  /collectivities/{id}/activities/federation:
+    post: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
+      requestBody: 
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Activity"
+      responses:
+        '200':
+           description: New activity added
+           content: 
+             application/json:
+              schema: 
+                $ref: "#/components/schemas/Activity"
+        '400':
+          description: The collectivity from id={id} is not found
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example:
+                message: The collectivity from id=909 is not found
+                status: 400
 components:
   schemas:
     Collectivities:
