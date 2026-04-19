@@ -483,21 +483,17 @@ paths:
                   message: The collectivity from id=909 is not found
                   status: 400
 
-  /collectivities/{id}/activities/federation:
+  /federation/activities/:
     post: 
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: 
-            type: integer
+      description: Create an activity for all collectivities
       requestBody: 
+        required: true
         content:
           application/json:
             schema: 
               $ref: "#/components/schemas/Activity"
       responses:
-        '200':
+        '201':
            description: New activity added
            content: 
              application/json:
@@ -719,8 +715,14 @@ components:
       properties: 
         title: 
           type: string
+        Activitytype: 
+           $ref: "#/components/schemas/ActivityType"
         date: 
+          description: Date if the activity is one time
           type: string
+        frequencyDate: 
+          description: frenquency is the activity is reccurent
+          $ref: "#/components/schemas/ReccurenceRules"
         presence: 
           type: string
           enum: 
@@ -729,9 +731,43 @@ components:
         members:
           type: string
           enum:
-            - SENIOR_MEMBER
-            - JUNIOR_MEMBER
+            - SENIOR_ONLY
+            - JUNIOR_ONLY
+            - PRESIDENT_ONLY
+            - TREASURER_ONLY
             - ALL
+    ActivityType:
+      type: string
+      enum:
+        - GENERAL_MEETING
+        - JUNIOR_TRAINING
+        - EXCEPTIONAL
+        - FEDERAL_MEETING
+    ReccurenceRules:
+      type: object
+      required: 
+        - frequency
+        - dayOfWeek
+      properties:
+        frequency:
+          type: string
+          enum: 
+            - MONTHLY 
+            - YEARLY
+        dayOfWeek: 
+          type: integer
+          minimum: 1
+          maximum: 7
+        weekOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 4
+        startDate: 
+          type: string
+          format: date
+        endDate: 
+          type: string
+          format: date
     Error:
       type: object
       properties:
