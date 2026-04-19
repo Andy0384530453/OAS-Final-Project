@@ -466,7 +466,19 @@ paths:
         content:
           application/json:
             schema:
-               $ref: "#/components/schemas/Activity"
+              $ref: "#/components/schemas/Activity"
+            example: 
+              title: Formation techniques agricoles
+              Activitytype: JUNIOR_TRAINING
+              date: 2026-04-28
+              frequencyDate: 
+                frequency: MONTHLY
+                dayOfWeek: 6
+                weekOfMonth: 4
+                startDate: 2026-01-01
+                endDate: 2026-12-31
+              presence: OBLIGATORY
+              members: JUNIOR_ONLY
 
       responses:
         '200':
@@ -475,6 +487,18 @@ paths:
               application/json:
                 schema: 
                   $ref: "#/components/schemas/Activity"
+                example:
+                  title: Assemblée générale mensuelle - Avril 2026
+                  Activitytype: GENERAL_MEETING
+                  date: null
+                  frequencyDate: 
+                    frequency: MONTHLY
+                    dayOfWeek: 4
+                    weekOfMonth: 2
+                    startDate: 2026-01-01
+                    endDate: 2026-12-31
+                  presence: OBLIGATORY
+                  members: ALL
         '404': 
             description: The collectivity from id={id} is not found
             content: 
@@ -503,6 +527,18 @@ paths:
           application/json:
             schema: 
               $ref: "#/components/schemas/Activity"
+            example:
+              title: Assemblée générale mensuelle - Avril 2026
+              Activitytype: GENERAL_MEETING
+              date: null
+              frequencyDate: 
+                frequency: MONTHLY
+                dayOfWeek: 4
+                weekOfMonth: 2
+                startDate: 2026-01-01
+                endDate: 2026-12-31
+              presence: OBLIGATORY
+              members: ALL
       responses:
         '201':
            description: New activity added
