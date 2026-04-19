@@ -453,6 +453,7 @@ paths:
               example:
                 message: Collectivity.id=19 is not found
                 status: 404
+        
   /collectivities/{id}/activities:
     post: 
       parameters:
@@ -473,7 +474,7 @@ paths:
               application/json:
                 schema: 
                   $ref: "#/components/schemas/Activity"
-        '400': 
+        '404': 
             description: The collectivity from id={id} is not found
             content: 
               application/json: 
@@ -481,7 +482,16 @@ paths:
                   $ref: "#/components/schemas/Error"
                 example:
                   message: The collectivity from id=909 is not found
-                  status: 400
+                  status: 404
+        '400': 
+          description: You must complete the informations about the new activity
+          content: 
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: You must complete the informations about the new activity
+                status: 400
 
   /federation/activities/:
     post: 
@@ -499,7 +509,7 @@ paths:
              application/json:
               schema: 
                 $ref: "#/components/schemas/Activity"
-        '400':
+        '404':
           description: The collectivity from id={id} is not found
           content: 
             application/json:
@@ -507,7 +517,17 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 message: The collectivity from id=909 is not found
+                status: 404
+        '400': 
+          description: You must complete the informations about the new activity
+          content: 
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: You must complete the informations about the new activity
                 status: 400
+
 components:
   schemas:
     Collectivities:
