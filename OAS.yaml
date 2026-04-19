@@ -467,6 +467,7 @@ paths:
           application/json:
             schema:
                $ref: "#/components/schemas/Activity"
+
       responses:
         '200':
             description: New activity added
@@ -509,6 +510,18 @@ paths:
              application/json:
               schema: 
                 $ref: "#/components/schemas/Activity"
+              example:
+                title: Assemblée générale mensuelle - Avril 2026
+                Activitytype: GENERAL_MEETING
+                date: null
+                frequencyDate: 
+                  frequency: MONTHLY
+                  dayOfWeek: 4
+                  weekOfMonth: 2
+                  startDate: 2026-01-01
+                  endDate: 2026-12-31
+                presence: OBLIGATORY
+                members: ALL
         '404':
           description: The collectivity from id={id} is not found
           content: 
