@@ -749,7 +749,6 @@ paths:
                 message: You must complete your rapport before sending it
                 status: 400
           
-                
 components:
   schemas:
     Collectivities:
