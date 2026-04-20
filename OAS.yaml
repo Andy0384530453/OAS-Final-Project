@@ -725,7 +725,7 @@ paths:
               $ref: "#/components/schemas/CollectivityStatSummary"
 
       responses: 
-        '200':
+        '201':
           description: Your report is sent
           content: 
             application/json:
@@ -1051,19 +1051,19 @@ components:
           type: integer
           description: Number of active members
     CollectivityStatSummary: 
-              type: object
-              required:
-                - month
-                - attendanceRate
-                - totalMember
-              properties:
-                month: 
-                  type: string
-                  format: date
-                attendanceRate:
-                  type: number
-                totalMembers:
-                  type: integer
+      type: object
+      required:
+        - month
+        - attendanceRate
+        - totalMember
+      properties:
+        month: 
+          type: string
+          format: date
+        attendanceRate:
+          type: number
+        totalMembers:
+          type: integer
 
     Error:
       type: object
