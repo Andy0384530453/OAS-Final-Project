@@ -11,7 +11,8 @@ paths:
     post: 
       description: Create a new collectivity
       operationId: newCollectivities
-
+      tags: 
+        - Collectivity
       requestBody:
         required: true
         content:
@@ -27,7 +28,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Collectivities'
                 
-
         '400':
           description: Collectivity creation not satisfied
           content:
@@ -50,12 +50,12 @@ paths:
   /collectivities/{id}/members: 
     post:
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        example: 12
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 12
       description: Member inscription
       tags: 
         - Members 
@@ -64,32 +64,32 @@ paths:
         content:
           application/json: 
             schema:
-              type : object
+              type: object
               properties:
                 sponsorId:
                   type: integer
-                NewMemberInformation: 
+                NewMemberInformations: 
                   $ref: "#/components/schemas/Members"
                 Transaction: 
                   $ref: "#/components/schemas/Transaction"
-            example:
-              sponsorId: 12
-              NewMemberInformation: 
-                id: 134
-                name: Rivo Andrianantenaina
-                birthdate: 1988-11-02
-                gender: male
-                address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
-                occupation: collector
-                phone: +261 34 12 345 67
-                email: rivo.andria@example.mg
-                collectivityId: 3
-              Transaction:
-                references: PAR-MDG-20260416-089
-                amount: 50000
-                payment: Orange_money
-                status: success
-                transactionDate: 2026-04-16T09:15:22.123Z
+              example:
+                sponsorId: 12
+                NewMemberInformations: 
+                  id: 134
+                  name: Rivo Andrianantenaina
+                  birthdate: 1988-11-02
+                  gender: male
+                  address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
+                  occupation: collector
+                  phone: +261 34 12 345 67
+                  email: rivo.andria@example.mg
+                  collectivityId: 3
+                Transaction:
+                  references: PAR-MDG-20260416-089
+                  amount: 50000
+                  payment: Orange_money
+                  status: success
+                  transactionDate: 2026-04-16T09:15:22.123Z
       responses: 
         '201':
           description: Welcome to our collectivity
@@ -106,7 +106,7 @@ paths:
                     $ref: "#/components/schemas/Transaction"
               example:
                 sponsorId: 12
-                NewMemberInformation: 
+                NewMemberInformations: 
                   id: 134
                   name: Rivo Andrianantenaina
                   birthdate: 1988-11-02
@@ -120,7 +120,7 @@ paths:
                   references: PAR-MDG-20260416-089
                   amount: 50000
                   payment: Orange_money
-                  status: success
+                  status: SUCCESS
                   transactionDate: 2026-04-16T09:15:22.123Z
                        
         '400': 
@@ -141,6 +141,7 @@ paths:
               example: 
                 message: Your profile does not meet the requirements for membership
                 status: 403
+
   /members/{id}:
     put:
       description: Change Member informations or collective
@@ -169,7 +170,6 @@ paths:
               phone: +261 32 98 765 43
               email: miora.faniry@example.mg
               collectivityId: 3
-
       responses: 
         '200':
           description: Member information updated
@@ -182,13 +182,11 @@ paths:
                 name: Miora Faniry Razafimahatratra
                 birthdate: 1992-03-18
                 gender: female
-                address: Lot VA 15 Ter,   Andoharanofotsy, Antananarivo 102
+                address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
                 occupation: collector
                 phone: +261 32 98 765 43
                 email: miora.faniry@example.mg
                 collectivityId: 3
-               
-
         '404':
           description: Member not found
           content: 
@@ -198,12 +196,13 @@ paths:
               example: 
                 message: The member from id={id} is not found
                 status: 404
+
     delete: 
       tags:
-       - Members
+        - Members
       description: Do you want to leave 
       parameters: 
-        - name : id
+        - name: id
           in: path
           required: true
           schema: 
@@ -221,12 +220,11 @@ paths:
                 name: Miora Faniry Razafimahatratra
                 birthdate: 1992-03-18
                 gender: female
-                address: Lot VA 15 Ter,   Andoharanofotsy, Antananarivo 102
+                address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
                 occupation: collector
                 phone: +261 32 98 765 43
                 email: miora.faniry@example.mg
-            
-        '400':
+        '404':
           description: Member not found
           content:
             application/json:
@@ -234,27 +232,176 @@ paths:
                 $ref: "#/components/schemas/Error"
               example: 
                 message: The member from id={id} is not found
+                status: 404
+
+  /collectivities/{id}/contribution: 
+    post: 
+      description: You will Pay your contribution
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
+      tags: 
+        - Contribution
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Contribution"
+            example:
+              memberId: 134
+              collectivityId: 4
+              period: 2026-04
+              contributionPeriod: MONTHLY
+              nature: REGULAR
+              receiptNumber: REC-20260417-001
+              collectedBy: 42
+              transaction: 
+                references: CONT-20260417-089
+                amount: 50000
+                payment: ORANGE_MONEY
+                status: SUCCESS
+                transactionDate: 2026-04-17T07:30:34.267Z
+      responses:
+        '200':
+          description: Your contribution is payed
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Contribution"
+              example:
+                memberId: 134
+                collectivityId: 4
+                period: 2026-04
+                contributionPeriod: MONTHLY
+                nature: REGULAR
+                receiptNumber: REC-20260417-001
+                collectedBy: 42
+                transaction: 
+                  references: CONT-20260417-089
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: 2026-04-17T07:30:34.267Z
+        '400':
+          description: The collectivity from id={id} is not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: The collectivity from id={id} is not found
                 status: 400
+           
+    get:
+      description: The note about the contribution
+      tags: 
+        - Contribution 
+      parameters:
+        - name: id
+          in: path 
+          required: true
+          schema: 
+            type: integer
+      responses:
+        '200': 
+          description: This is the note about the contribution from the member number {memberId}
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Contribution"
+              example:
+                memberId: 134
+                collectivityId: 4
+                period: 2026-04
+                contributionPeriod: MONTHLY
+                nature: REGULAR
+                receiptNumber: REC-20260417-001
+                collectedBy: 42
+                transaction: 
+                  references: CONT-20260417-089
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: 2026-04-17T07:30:34.267Z
+                federationShare: 4000
+                transferredToFederation: true
+        '400':
+          description: The collectivity from id={id} is not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: The collectivity from id={id} is not found
+                status: 400
+
+  /collectivities/{id}/contribution/federation:
+    post:
+      description: Transfer of the contribution to the federation
+      tags: 
+        - Contribution
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
+      requestBody:
+        content:
+          application/json: 
+            schema: 
+              properties:
+                period: 
+                  type: string
+                transfertConfirm: 
+                  type: boolean
+      responses: 
+        '200':
+          description: Transfer succeed
+          content: 
+            application/json: 
+              schema: 
+                properties:
+                  transferredAmount: 
+                    type: number
+                  contributionCount: 
+                    type: integer
+                  transfertDate:
+                    type: string
+                    format: date-time
+                  transaction: 
+                    $ref: "#/components/schemas/Transaction"
+                example:
+                  transferredAmount: 10000
+                  contributionsCount: 5
+                  transferDate: "2026-04-30T23:59:59Z"
+                  transaction:
+                    references: "FED-TRF-20260430-001"
+                    amount: 10000
+                    payment: "BANK_TRANSFER"
+                    status: "SUCCESS"
+                    transactionDate: "2026-04-30T23:59:59Z"
 
   /collectivities/{id}/accounts:
     post:
       description: add treasury account
       operationId: createCollectivityAccount
-
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema: 
-          type: integer
-      
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Account'
-        required: true
-
       responses:
         '201':
           description: account created 
@@ -262,7 +409,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-
         '404':
           description: Collectivity.id={id} is not found
           content:
@@ -272,17 +418,16 @@ paths:
               example:
                 message: Collectivity.id=19 is not found
                 status: 404
+
     get:
       description: get account 
       operationId: getCollectivityAccounts 
-      
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema: 
-          type: integer 
-
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: integer 
       responses:
         '200':
           description: find account
@@ -290,7 +435,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-        
         '404':
           description: Collectivity.id={id} is not found
           content:
@@ -300,44 +444,183 @@ paths:
               example:
                 message: Collectivity.id=19 is not found
                 status: 404
-  
+
+  /collectivities/{id}/activities:
+    post: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Activity"
+            example: 
+              title: Formation techniques agricoles
+              Activitytype: JUNIOR_TRAINING
+              date: 2026-04-28
+              frequencyDate: 
+                frequency: MONTHLY
+                dayOfWeek: 6
+                weekOfMonth: 4
+                startDate: 2026-01-01
+                endDate: 2026-12-31
+              presence: OBLIGATORY
+              members: JUNIOR_ONLY
+      responses:
+        '200':
+          description: New activity added
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Activity"
+              example:
+                title: Assemblée générale mensuelle - Avril 2026
+                Activitytype: GENERAL_MEETING
+                date: null
+                frequencyDate: 
+                  frequency: MONTHLY
+                  dayOfWeek: 4
+                  weekOfMonth: 2
+                  startDate: 2026-01-01
+                  endDate: 2026-12-31
+                presence: OBLIGATORY
+                members: ALL
+        '404': 
+          description: The collectivity from id={id} is not found
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example:
+                message: The collectivity from id=909 is not found
+                status: 404
+        '400': 
+          description: You must complete the informations about the new activity
+          content: 
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: You must complete the informations about the new activity
+                status: 400
+
+    get:
+      description: Get activities for a collectivity
+      operationId: getCollectivityActivities
+      tags:
+        - Activities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Activity"
+        '404':
+          description: Collectivity not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /federation/activities:
+    post: 
+      description: Create an activity for all collectivities
+      operationId: createFederationActivity
+      tags:
+        - Activities
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Activity"
+            example:
+              title: Assemblée générale mensuelle - Avril 2026
+              Activitytype: GENERAL_MEETING
+              date: null
+              frequencyDate: 
+                frequency: MONTHLY
+                dayOfWeek: 4
+                weekOfMonth: 2
+                startDate: 2026-01-01
+                endDate: 2026-12-31
+              presence: OBLIGATORY
+              members: ALL
+      responses:
+        '201':
+          description: New activity added
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Activity"
+              example:
+                title: Assemblée générale mensuelle - Avril 2026
+                Activitytype: GENERAL_MEETING
+                date: null
+                frequencyDate: 
+                  frequency: MONTHLY
+                  dayOfWeek: 4
+                  weekOfMonth: 2
+                  startDate: 2026-01-01
+                  endDate: 2026-12-31
+                presence: OBLIGATORY
+                members: ALL
+        '400': 
+          description: You must complete the informations about the new activity
+          content: 
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: You must complete the informations about the new activity
+                status: 400
+
   /activities/{id}/attendance:
     post:
       description: attendance record provided by id
       operationId: recordAttendance
-
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/Attendance"
-
       responses:
         '201':
           description: attendance registration
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Attendance'
-               
-
+                $ref: "#/components/schemas/Attendance"
         '404':
           description: activity or member not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                example: 
-                  message: member.id=14 is not found
-                  status: 404
+              example: 
+                message: member.id=14 is not found
+                status: 404
 
   /members/{id}/attendance-rate:
     get:
@@ -349,23 +632,20 @@ paths:
           required: true
           schema:
             type: integer
-
         - name: from
           in: query
           required: true
           schema:
             type: string
             format: date
-
         - name: to
           in: query
           required: true
           schema:
             type: string
             format: date
-
       responses:
-        "200":
+        '200':
           description: attendance rate calculated
           content:
             application/json:
@@ -375,36 +655,27 @@ paths:
                   attendanceRate:
                     type: number
                     format: float
-
-        "400":
+        '400':
           description: missing queryParameters
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                example: 
-                  message: the parameters 'to' and 'from' are not present
-                  status: 400
+              example: 
+                message: the parameters 'to' and 'from' are not present
+                status: 400
         '404':
-          description:  member not found
+          description: member not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                example:
-                  message: member.id=14 is not found
-                  status: 404
-    
-
-
-
-  
-          
-
+              example:
+                message: member.id=14 is not found
+                status: 404
 
 components:
   schemas:
-
     Collectivities:
       type: object
       properties:
@@ -422,6 +693,16 @@ components:
         
     Members:
       type: object
+      required:
+        - id
+        - name
+        - birthdate
+        - gender
+        - address
+        - occupation
+        - phone
+        - email
+        - collectivityId
       properties:
         id: 
           type: integer
@@ -450,12 +731,13 @@ components:
     Positions:
       type: string
       enum: 
-          - PRESIDENT
-          - VICE PRESIDENT 
-          - TREASURER 
-          - SECREATARY
-          - SENIOR_MEMBER
-          - JUNIOR_MEMBER
+        - PRESIDENT
+        - VICE PRESIDENT 
+        - TREASURER 
+        - SECRETARY
+        - SENIOR_MEMBER
+        - JUNIOR_MEMBER
+
     Mandate: 
       type: object
       required: 
@@ -476,18 +758,45 @@ components:
           $ref: "#/components/schemas/Positions"
         startDate: 
           type: string
-          format: date-time
+          format: date
         endDate:
           type: string
-          format: date-time
+          format: date
 
-       
+    Federation: 
+      type: object
+      required:
+        - id
+        - federationPresident
+        - federationVicePresident
+        - federationSecretary
+        - federationTreasurer
+        - mandateStartDate
+        - mandateEndDate
+      properties: 
+        id: 
+          type: integer
+        federationPresident: 
+          $ref: "#/components/schemas/Members"
+        federationVicePresident:
+          $ref: "#/components/schemas/Members"
+        federationSecretary: 
+          $ref: "#/components/schemas/Members"
+        federationTreasurer: 
+          $ref: "#/components/schemas/Members"
+        mandateStartDate: 
+          type: string
+          format: date
+        mandateEndDate: 
+          type: string
+          format: date
+
     Transaction: 
+      type: object
       required:
         - references
         - amount
         - status
-      type: object
       properties:
         references: 
           type: string
@@ -502,14 +811,40 @@ components:
             - FAILURE
         transactionDate: 
           type: string
-          format: date-time   
-    Error:
+          format: date-time
+
+    Contribution:
       type: object
       properties:
-        message:
-          type: string
-        status:
+        id: 
           type: integer
+        memberId: 
+          type: integer
+        collectivityId:
+          type: integer
+        period: 
+          type: string
+        contributionPeriod: 
+          type: string
+          enum: 
+            - MONTHLY
+            - YEARLY
+        nature: 
+          type: string
+          enum:
+            - REGULAR
+            - SPECIAL_EVENT
+            - EMERGENCY
+        receiptNumber: 
+          type: string
+        collectedBy:
+          type: integer
+        transaction: 
+          $ref: "#/components/schemas/Transaction"  
+        federationShare:
+          type: number
+        transferredToFederation:
+          type: boolean
 
     Account:
       type: object
@@ -543,8 +878,73 @@ components:
           type: string
           minLength: 2
           maxLength: 2
+
+    Activity: 
+      type: object
+      required: 
+        - title
+        - date
+        - presence
+        - members
+      properties: 
+        title: 
+          type: string
+        Activitytype: 
+          $ref: "#/components/schemas/ActivityType"
+        date: 
+          description: Date if the activity is one time
+          type: string
+        frequencyDate: 
+          description: frequency is the activity is recurrent
+          $ref: "#/components/schemas/ReccurenceRules"
+        presence: 
+          type: string
+          enum: 
+            - OBLIGATORY
+            - OPTIONAL
+        members:
+          type: string
+          enum:
+            - SENIOR_ONLY
+            - JUNIOR_ONLY
+            - PRESIDENT_ONLY
+            - TREASURER_ONLY
+            - ALL
+
+    ActivityType:
+      type: string
+      enum:
+        - GENERAL_MEETING
+        - JUNIOR_TRAINING
+        - EXCEPTIONAL
+        - FEDERAL_MEETING
+
+    ReccurenceRules:
+      type: object
+      required: 
+        - frequency
+        - dayOfWeek
+      properties:
+        frequency:
+          type: string
+          enum: 
+            - MONTHLY 
+            - YEARLY
+        dayOfWeek: 
+          type: integer
+          minimum: 1
+          maximum: 7
+        weekOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 4
+        startDate: 
+          type: string
+          format: date
+        endDate: 
+          type: string
+          format: date
     
-  
     Attendance:
       type: object
       properties:
@@ -564,7 +964,10 @@ components:
           type: number
           format: float
 
-   
-  
-        
-                  
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
