@@ -731,9 +731,25 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/CollectivityStatSummary"
+        '404':
+          description: The collectivity id={id} is not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
               example: 
+                message: The collectivity id=167 is not found
+        '400':
+          description: You must complete your rapport before sending it
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Error"
+              example: 
+                message: You must complete your rapport before sending it
+                status: 400
+          
                 
-
 components:
   schemas:
     Collectivities:
