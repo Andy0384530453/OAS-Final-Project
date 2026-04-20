@@ -272,11 +272,6 @@ paths:
               example:
                 message: Collectivity.id=19 is not found
                 status: 404
-        
-
-        
-
-      
     get:
       description: get account 
       operationId: getCollectivityAccounts 
@@ -305,6 +300,106 @@ paths:
               example:
                 message: Collectivity.id=19 is not found
                 status: 404
+  
+  /activities/{id}/attendance:
+    post:
+      description: attendance record provided by id
+      operationId: recordAttendance
+
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Attendance"
+
+      responses:
+        '201':
+          description: attendance registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attendance'
+               
+
+        '404':
+          description: activity or member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                example: 
+                  message: member.id=14 is not found
+                  status: 404
+
+  /members/{id}/attendance-rate:
+    get:
+      description: get attendance rate of a member for a period
+      operationId: getAttendanceRate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+
+      responses:
+        "200":
+          description: attendance rate calculated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attendanceRate:
+                    type: number
+                    format: float
+
+        "400":
+          description: missing queryParameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                example: 
+                  message: the parameters 'to' and 'from' are not present
+                  status: 400
+        '404':
+          description:  member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                example:
+                  message: member.id=14 is not found
+                  status: 404
+    
+
+
+
+  
+          
 
 
 components:
@@ -449,13 +544,27 @@ components:
           minLength: 2
           maxLength: 2
     
-    Error:
+  
+    Attendance:
       type: object
       properties:
-        message:
-          type: string
-        status:
+        memberId:
           type: integer
+        activityId:
+          type: integer
+        present:
+          type: boolean
+        justification:
+          type: string
+
+    AttendanceRate:
+      type: object
+      properties:
+        attendanceRate:
+          type: number
+          format: float
+
+   
   
         
                   
