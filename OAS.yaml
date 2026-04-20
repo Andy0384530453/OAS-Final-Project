@@ -714,6 +714,15 @@ paths:
               example:  
                 message: The collectivity id=111 is not found
                 status: 400
+        '404':
+          description: You must add stats periods
+          content: 
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: You must add stats dates
+                status: 404
     post: 
       parameters:
          - name: id
@@ -751,6 +760,7 @@ paths:
                 $ref: "#/components/schemas/Error"
               example: 
                 message: The collectivity id=167 is not found
+                status: 400
         '400':
           description: You must complete your rapport before sending it
           content: 
