@@ -701,6 +701,10 @@ paths:
             application/json: 
               schema: 
                 $ref: "#/components/schemas/CollectivityStats"
+              example: 
+                globalAttendanceRate: 78.5
+                totalMembers: 1240
+                activeMembers: 967
         '400':
           description: The collectivity id={id} is not found
           content: 
@@ -723,6 +727,10 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CollectivityStatSummary"
+            example: 
+              month: 2025-02-01
+              attendanceRate: 79.1
+              totalMembers: 1220
 
       responses: 
         '201':
@@ -731,6 +739,10 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/CollectivityStatSummary"
+              example: 
+                month: 2025-02-01
+                attendanceRate: 79.1
+                totalMembers: 1220
         '404':
           description: The collectivity id={id} is not found
           content: 
