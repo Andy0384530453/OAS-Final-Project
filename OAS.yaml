@@ -673,6 +673,66 @@ paths:
               example:
                 message: member.id=14 is not found
                 status: 404
+  /collectivities/{id}/members/stats:
+    get: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          required: true
+          schema: 
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string 
+            format: date
+      description: active members rate
+      responses: 
+        '200':
+          description: These are the rate of the active members
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/CollectivityStats"
+        '400':
+          description: The collectivity id={id} is not found
+          content: 
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:  
+                message: The collectivity id=111 is not found
+                status: 400
+    post: 
+      parameters:
+         - name: id
+           in: path
+           required: true 
+           schema: 
+             type: integer
+      requestBody: 
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectivityStatSummary"
+
+      responses: 
+        '200':
+          description: Your report is sent
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/CollectivityStatSummary"
+              example: 
+                
 
 components:
   schemas:
@@ -963,6 +1023,32 @@ components:
         attendanceRate:
           type: number
           format: float
+    CollectivityStats:
+      type: object
+      properties: 
+        globalAttendanceRate: 
+          type: number
+          format: float
+        totalMembers: 
+          type: integer
+          description: number of registered members
+        activeMembers: 
+          type: integer
+          description: Number of active members
+    CollectivityStatSummary: 
+              type: object
+              required:
+                - month
+                - attendanceRate
+                - totalMember
+              properties:
+                month: 
+                  type: string
+                  format: date
+                attendanceRate:
+                  type: number
+                totalMembers:
+                  type: integer
 
     Error:
       type: object
