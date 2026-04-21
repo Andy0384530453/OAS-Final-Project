@@ -387,6 +387,8 @@ paths:
     post:
       description: add treasury account
       operationId: createCollectivityAccount
+      tags: 
+        - Account
       parameters:
         - name: id
           in: path
@@ -418,6 +420,8 @@ paths:
 
     get:
       description: get account
+      tags: 
+        - Account
       operationId: getCollectivityAccounts
       parameters:
         - name: id
@@ -444,6 +448,8 @@ paths:
 
   /collectivities/{id}/activities:
     post:
+      tags:
+        - Activities
       parameters:
         - name: id
           in: path
@@ -590,7 +596,7 @@ paths:
     post:
       description: attendance record provided by id
       tags: 
-        - Activities
+        - Attendances
       operationId: recordAttendance
       parameters:
         - name: id
@@ -623,6 +629,8 @@ paths:
 
   /members/{id}/attendance-rate:
     get:
+      tags: 
+        - Attendances
       description: get attendance rate of a member for a period
       operationId: getAttendanceRate
       parameters:
@@ -675,6 +683,8 @@ paths:
 
   /collectivities/{id}/members/stats:
     get:
+      tags:
+        - Statistics
       parameters:
         - name: id
           in: path
@@ -725,6 +735,8 @@ paths:
                 status: 400
 
     post:
+      tags:
+        - Statistics
       parameters:
         - name: id
           in: path
@@ -773,6 +785,8 @@ paths:
 
   /collectivities/{collectivityId}/members/{memberId}/statistics:
     get:
+      tags:
+        - Statistics
       description: returns a JSON object relating to the detailed statistics by id
       operationId: getMemberStatistics
       parameters:
