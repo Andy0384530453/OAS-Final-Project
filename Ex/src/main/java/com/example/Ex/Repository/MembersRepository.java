@@ -1,7 +1,9 @@
-package main;
+package main.java.com.example.Ex.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import main.java.com.example.Ex.Collectivities;
 
 public class MembersRepository {
     public Collectivities addNewCollectivity(Collectivities collectivity){

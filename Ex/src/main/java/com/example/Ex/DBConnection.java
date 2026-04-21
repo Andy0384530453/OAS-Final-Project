@@ -1,12 +1,10 @@
-package com.example.Ex;
+package main.java.com.example.Ex;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-
-
 
     private String url = System.getenv("URL");
     private String user = System.getenv("USER");
