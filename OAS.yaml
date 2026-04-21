@@ -1,152 +1,203 @@
 openapi: 3.1.0
 info:
-  title: Fédération de collectivités agricoles
+  title: Federation of Agricultural Communities
   version: 1.0.0
 
 servers:
   - url: http://localhost:8080
 
-paths:
-  /collectivities:
-    post:
-      description: Create a new collectivity
-      operationId: newCollectivities
-      tags:
-        - Collectivity
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Collectivity'
-      responses:
-        '201':
-          description: Collectivity created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Collectivity'
-        '400':
-          description: Collectivity creation not satisfied
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                message: You must complete the informations about the collectivity
-                status: 400
-        '403':
-          description: Collectivity creation not authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                message: The new Collectivity need to follow all the requirement
+tags:
+  - name: Community
+    description: Management of agricultural communities
+  - name: Members
+    description: Member management
+  - name: Contribution
+    description: Contributions and transfers
+  - name: Accounts
+    description: Cash position management
+  - name: Activities
+    description: Community and federation activities
+  - name: Attendance
+    description: Member attendance tracking
+  - name: Statistics
+    description: Community and member statistics
+  - name: FederationStatistics
+    description: Global federation statistics
 
-  /collectivities/{id}/members:
+paths:
+
+  /communities:
     post:
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          example: 12
-      description: Member inscription
+      summary: Create a new community
+      description: >
+        Creates a new agricultural community. Required conditions: at least 10 registered members
+        with at least 6 months seniority within the federation, specific positions must be filled,
+        and formal authorization from the federation is required.
+      operationId: createCommunity
       tags:
-        - Members
+        - Community
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                sponsorId:
-                  type: integer
-                NewMemberInformations:
-                  $ref: "#/components/schemas/Member"
-                Transaction:
-                  $ref: "#/components/schemas/Transaction"
-              example:
-                sponsorId: 12
-                NewMemberInformations:
-                  id: 134
-                  name: Rivo Andrianantenaina
-                  birthdate: 1988-11-02
-                  gender: male
-                  address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
-                  occupation: collector
-                  phone: "+261 34 12 345 67"
-                  email: rivo.andria@example.mg
-                  collectivityId: 3
-                Transaction:
-                  references: PAR-MDG-20260416-089
-                  amount: 50000
-                  payment: Orange_money
-                  status: success
-                  transactionDate: 2026-04-16T09:15:22.123Z
+              $ref: '#/components/schemas/Community'
+            example:
+              name: Agricultural Community of Vakinankaratra
+              city: Antsirabe
+              specialty: Rice cultivation
       responses:
         '201':
-          description: Welcome to our collectivity
+          description: Community successfully created
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  sponsorId:
-                    type: integer
-                  NewMemberInformations:
-                    $ref: "#/components/schemas/Member"
-                  Transaction:
-                    $ref: "#/components/schemas/Transaction"
+                $ref: '#/components/schemas/Community'
               example:
-                sponsorId: 12
-                NewMemberInformations:
-                  id: 134
-                  name: Rivo Andrianantenaina
-                  birthdate: 1988-11-02
-                  gender: male
-                  address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
-                  occupation: teacher
-                  phone: "+261 34 12 345 67"
-                  email: rivo.andria@example.mg
-                  collectivityId: 3
-                Transaction:
-                  references: PAR-MDG-20260416-089
-                  amount: 50000
-                  payment: Orange_money
-                  status: SUCCESS
-                  transactionDate: 2026-04-16T09:15:22.123Z
+                id: 5
+                name: Agricultural Community of Vakinankaratra
+                city: Antsirabe
+                specialty: Rice cultivation
+                creationDateTime: "2026-04-21T08:00:00.000Z"
         '400':
-          description: Information incomplete
+          description: Incomplete community information
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: You must complete all the informations about the new member
+                message: Please complete all community information
                 status: 400
         '403':
-          description: Admission not authorized
+          description: Unauthorized creation — conditions not met
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: Your profile does not meet the requirements for membership
+                message: The new community must meet all required conditions
                 status: 403
 
-  /members/{id}:
-    put:
-      description: Change Member informations or collective
+  
+  /communities/{id}/members:
+    post:
+      summary: Register a new member in a community
+      description: >
+        Admits a new member to a community according to the new admission conditions (B-2)
+        effective since 04/21/2026. The candidate must be sponsored by at least two confirmed
+        members of the federation, with the number of sponsors from the target community being
+        at least equal to the number of sponsors from other communities. They must provide their
+        personal information and the nature of their relationship with each sponsor. They must pay
+        membership fees of 50,000 MGA as well as all mandatory annual contributions imposed by the
+        community, via mobile money or bank transfer.
+      operationId: addMember
       tags:
         - Members
       parameters:
         - name: id
           in: path
           required: true
+          description: Community identifier
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberRegistrationRequest'
+            example:
+              sponsors:
+                - memberId: 12
+                  communityId: 3
+                  relationshipWithCandidate: friend
+                - memberId: 27
+                  communityId: 3
+                  relationshipWithCandidate: colleague
+              newMemberInformation:
+                name: Rivo Andrianantenaina
+                birthdate: "1988-11-02"
+                gender: male
+                address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
+                occupation: collector
+                phone: "+261 34 12 345 67"
+                email: rivo.andria@example.mg
+                communityId: 3
+              transactions:
+                - reference: PAR-MDG-20260421-001
+                  amount: 50000
+                  payment: ORANGE_MONEY
+                  status: SUCCESS
+                  transactionDate: "2026-04-21T09:15:22.123Z"
+                - reference: PAR-MDG-20260421-002
+                  amount: 200000
+                  payment: BANK_TRANSFER
+                  status: SUCCESS
+                  transactionDate: "2026-04-21T09:16:00.000Z"
+      responses:
+        '201':
+          description: Member successfully admitted to the community
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+              example:
+                id: 134
+                name: Rivo Andrianantenaina
+                birthdate: "1988-11-02"
+                gender: male
+                address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
+                occupation: collector
+                phone: "+261 34 12 345 67"
+                email: rivo.andria@example.mg
+                communityId: 3
+        '400':
+          description: Incomplete information for the new member
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Please complete all information for the new member
+                status: 400
+        '403':
+          description: >
+            Admission not authorized — sponsorship conditions not met
+            (e.g., insufficient number of sponsors, imbalance between communities,
+            or incomplete payment)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: The number of sponsors from the target community must be at least equal to the number of external sponsors
+                status: 403
+        '404':
+          description: Community not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Community id=3 not found
+                status: 404
+
+  
+  /members/{id}:
+    put:
+      summary: Update member information or change community
+      description: >
+        Updates a member's personal information or transfers the member to another community
+        (e.g., in case of city change).
+      operationId: updateMember
+      tags:
+        - Members
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Member identifier
           schema:
             type: integer
           example: 17
@@ -155,386 +206,537 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Member"
+              $ref: '#/components/schemas/Member'
             example:
               id: 17
               name: Miora Faniry Razafimahatratra
-              birthdate: 1992-03-18
+              birthdate: "1992-03-18"
               gender: female
               address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
               occupation: collector
               phone: "+261 32 98 765 43"
               email: miora.faniry@example.mg
-              collectivityId: 3
+              communityId: 3
       responses:
         '200':
-          description: Member information updated
+          description: Member information successfully updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Member"
+                $ref: '#/components/schemas/Member'
               example:
                 id: 17
                 name: Miora Faniry Razafimahatratra
-                birthdate: 1992-03-18
+                birthdate: "1992-03-18"
                 gender: female
                 address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
                 occupation: collector
                 phone: "+261 32 98 765 43"
                 email: miora.faniry@example.mg
-                collectivityId: 3
+                communityId: 3
+        '400':
+          description: Incomplete or invalid information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: The provided information is incomplete or invalid
+                status: 400
         '404':
           description: Member not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: The member from id={id} is not found
+                message: Member id=17 not found
                 status: 404
 
     delete:
+      summary: Member resignation
+      description: Allows a member to resign from their community.
+      operationId: deleteMember
       tags:
         - Members
-      description: Do you want to leave
       parameters:
         - name: id
           in: path
           required: true
+          description: Member identifier
           schema:
             type: integer
           example: 17
       responses:
-        '200':
-          description: You left
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Member"
-              example:
-                id: 17
-                name: Miora Faniry Razafimahatratra
-                birthdate: 1992-03-18
-                gender: female
-                address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
-                occupation: collector
-                phone: "+261 32 98 765 43"
-                email: miora.faniry@example.mg
+        '204':
+          description: Member successfully removed
         '404':
           description: Member not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: The member from id={id} is not found
+                message: Member id=17 not found
                 status: 404
 
-  /collectivities/{id}/contribution:
+  
+  /communities/{id}/contributions:
     post:
-      description: You will Pay your contribution
+      summary: Record a member's contribution
+      description: >
+        Records a member's contribution to their community. The contribution can be
+        periodic (monthly or yearly) or one-time. The treasurer keeps track of the amount,
+        collection date, and payment method.
+      operationId: payContribution
+      tags:
+        - Contribution
       parameters:
         - name: id
           in: path
           required: true
+          description: Community identifier
           schema:
             type: integer
-      tags:
-        - Contribution
+          example: 4
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Contribution"
+              $ref: '#/components/schemas/Contribution'
             example:
               memberId: 134
-              collectivityId: 4
-              period: 2026-04
+              communityId: 4
+              period: "2026-04"
               contributionPeriod: MONTHLY
               nature: REGULAR
               receiptNumber: REC-20260417-001
               collectedBy: 42
               transaction:
-                references: CONT-20260417-089
+                reference: CONT-20260417-089
                 amount: 50000
                 payment: ORANGE_MONEY
                 status: SUCCESS
-                transactionDate: 2026-04-17T07:30:34.267Z
+                transactionDate: "2026-04-17T07:30:34.267Z"
       responses:
-        '200':
-          description: Your contribution is payed
+        '201':
+          description: Contribution successfully recorded
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Contribution"
+                $ref: '#/components/schemas/Contribution'
               example:
+                id: 456
                 memberId: 134
-                collectivityId: 4
-                period: 2026-04
+                communityId: 4
+                period: "2026-04"
                 contributionPeriod: MONTHLY
                 nature: REGULAR
                 receiptNumber: REC-20260417-001
                 collectedBy: 42
                 transaction:
-                  references: CONT-20260417-089
+                  reference: CONT-20260417-089
                   amount: 50000
                   payment: ORANGE_MONEY
                   status: SUCCESS
-                  transactionDate: 2026-04-17T07:30:34.267Z
+                  transactionDate: "2026-04-17T07:30:34.267Z"
+                federationShare: 4000
+                transferredToFederation: false
         '400':
-          description: The collectivity from id={id} is not found
+          description: Incomplete information or community not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: The collectivity from id={id} is not found
+                message: Community id=4 not found
                 status: 400
+        '404':
+          description: Member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Member id=134 not found
+                status: 404
 
     get:
-      description: The note about the contribution
+      summary: Get community contributions
+      description: >
+        Returns the list of contributions recorded for a community,
+        including details of the share transferred to the federation.
+      operationId: getContributions
       tags:
         - Contribution
       parameters:
         - name: id
           in: path
           required: true
+          description: Community identifier
           schema:
             type: integer
+          example: 4
+        - name: period
+          in: query
+          required: false
+          description: Filtering period in YYYY-MM format
+          schema:
+            type: string
+          example: "2026-04"
       responses:
         '200':
-          description: This is the note about the contribution from the member number {memberId}
+          description: List of community contributions
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Contribution"
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contribution'
               example:
-                memberId: 134
-                collectivityId: 4
-                period: 2026-04
-                contributionPeriod: MONTHLY
-                nature: REGULAR
-                receiptNumber: REC-20260417-001
-                collectedBy: 42
-                transaction:
-                  references: CONT-20260417-089
-                  amount: 50000
-                  payment: ORANGE_MONEY
-                  status: SUCCESS
-                  transactionDate: 2026-04-17T07:30:34.267Z
-                federationShare: 4000
-                transferredToFederation: true
-        '400':
-          description: The collectivity from id={id} is not found
+                - id: 456
+                  memberId: 134
+                  communityId: 4
+                  period: "2026-04"
+                  contributionPeriod: MONTHLY
+                  nature: REGULAR
+                  receiptNumber: REC-20260417-001
+                  collectedBy: 42
+                  transaction:
+                    reference: CONT-20260417-089
+                    amount: 50000
+                    payment: ORANGE_MONEY
+                    status: SUCCESS
+                    transactionDate: "2026-04-17T07:30:34.267Z"
+                  federationShare: 4000
+                  transferredToFederation: true
+        '404':
+          description: Community not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: The collectivity from id={id} is not found
-                status: 400
+                message: Community id=4 not found
+                status: 404
 
-  /collectivities/{id}/contribution/federation:
+  /communities/{id}/contributions/federation-transfer:
     post:
-      description: Transfer of the contribution to the federation
+      summary: Transfer contribution share to federation
+      description: >
+        Transfers the percentage of periodic contributions due to the federation
+        for a given period.
+      operationId: transferContributionToFederation
       tags:
         - Contribution
       parameters:
         - name: id
           in: path
           required: true
+          description: Community identifier
           schema:
             type: integer
+          example: 4
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              properties:
-                period:
-                  type: string
-                transferConfirm:
-                  type: boolean
+              $ref: '#/components/schemas/FederationTransferRequest'
+            example:
+              period: "2026-04"
+              transferConfirm: true
       responses:
         '200':
-          description: Transfer succeed
+          description: Transfer successfully completed
           content:
             application/json:
               schema:
-                properties:
-                  transferredAmount:
-                    type: number
-                  contributionCount:
-                    type: integer
-                  transferDate:
-                    type: string
-                    format: date-time
-                  transaction:
-                    $ref: "#/components/schemas/Transaction"
-                example:
-                  transferredAmount: 10000
-                  contributionsCount: 5
-                  transferDate: "2026-04-30T23:59:59Z"
-                  transaction:
-                    references: "FED-TRF-20260430-001"
-                    amount: 10000
-                    payment: "BANK_TRANSFER"
-                    status: "SUCCESS"
-                    transactionDate: "2026-04-30T23:59:59Z"
+                $ref: '#/components/schemas/FederationTransferResponse'
+              example:
+                transferredAmount: 10000
+                contributionsCount: 5
+                transferDate: "2026-04-30T23:59:59Z"
+                transaction:
+                  reference: FED-TRF-20260430-001
+                  amount: 10000
+                  payment: BANK_TRANSFER
+                  status: SUCCESS
+                  transactionDate: "2026-04-30T23:59:59Z"
+        '400':
+          description: Missing period or missing confirmation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Please confirm the transfer and specify the period
+                status: 400
+        '404':
+          description: Community not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Community id=4 not found
+                status: 404
 
-  /collectivities/{id}/accounts:
+  /communities/{id}/accounts:
     post:
-      description: add treasury account
-      operationId: createCollectivityAccount
+      summary: Add a cash account to a community
+      description: >
+        Adds an account (bank, mobile money, or cash box) to a community's treasury.
+        A community can only have one cash box, but multiple bank or mobile money accounts.
+      operationId: createCommunityAccount
+      tags:
+        - Accounts
       parameters:
         - name: id
           in: path
           required: true
+          description: Community identifier
           schema:
             type: integer
+          example: 4
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Account'
+            example:
+              typeAccount: BOA
+              holderName: Imerina Agricultural Community
+              accountDetail:
+                bankCode: "00006"
+                branchCode: "00789"
+                accountNumber: "00123456789"
+                ribKey: "14"
       responses:
         '201':
-          description: account created
+          description: Account successfully created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-        '404':
-          description: Collectivity.id={id} is not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
               example:
-                message: Collectivity.id=19 is not found
-                status: 404
-
-    get:
-      description: get account
-      operationId: getCollectivityAccounts
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: find account
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Account'
-        '404':
-          description: Collectivity.id={id} is not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                message: Collectivity.id=19 is not found
-                status: 404
-
-  /collectivities/{id}/activities:
-    post:
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Activity"
-            example:
-              title: Formation techniques agricoles
-              Activitytype: JUNIOR_TRAINING
-              date: 2026-04-28
-              frequencyDate:
-                frequency: MONTHLY
-                dayOfWeek: 6
-                weekOfMonth: 4
-                startDate: 2026-01-01
-                endDate: 2026-12-31
-              presence: OBLIGATORY
-              members: JUNIOR_ONLY
-      responses:
-        '200':
-          description: New activity added
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Activity"
-              example:
-                title: Assemblée générale mensuelle - Avril 2026
-                Activitytype: GENERAL_MEETING
-                date: null
-                frequencyDate:
-                  frequency: MONTHLY
-                  dayOfWeek: 4
-                  weekOfMonth: 2
-                  startDate: 2026-01-01
-                  endDate: 2026-12-31
-                presence: OBLIGATORY
-                members: ALL
-        '404':
-          description: The collectivity from id={id} is not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-              example:
-                message: The collectivity from id=909 is not found
-                status: 404
+                id: 8
+                typeAccount: BOA
+                holderName: Imerina Agricultural Community
+                accountDetail:
+                  bankCode: "00006"
+                  branchCode: "00789"
+                  accountNumber: "00123456789"
+                  ribKey: "14"
+                balance: 0
         '400':
-          description: You must complete the informations about the new activity
+          description: Invalid account information or cash box already exists
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: You must complete the informations about the new activity
+                message: A cash box already exists for this community
                 status: 400
+        '404':
+          description: Community not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Community id=4 not found
+                status: 404
 
     get:
-      description: Get activities for a collectivity
-      operationId: getCollectivityActivities
+      summary: Get community cash accounts
+      description: Returns the list of all cash accounts for a community with their balances.
+      operationId: getCommunityAccounts
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Community identifier
+          schema:
+            type: integer
+          example: 4
+      responses:
+        '200':
+          description: List of community accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        '404':
+          description: Community not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Community id=4 not found
+                status: 404
+
+  /communities/{id}/accounts/{accountId}:
+    get:
+      summary: Get specific account balance
+      description: Returns the details and current balance of a cash account.
+      operationId: getCommunityAccountById
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Community identifier
+          schema:
+            type: integer
+          example: 4
+        - name: accountId
+          in: path
+          required: true
+          description: Account identifier
+          schema:
+            type: integer
+          example: 8
+      responses:
+        '200':
+          description: Account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Community or account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Account id=8 for community id=4 not found
+                status: 404
+
+  /communities/{id}/activities:
+    post:
+      summary: Create an activity for a community
+      description: >
+        Creates a new activity for a community (monthly general assembly,
+        junior training, exceptional activity). For recurring activities,
+        the recurrence date is defined via recurrenceRules.
+      operationId: createCommunityActivity
       tags:
         - Activities
       parameters:
         - name: id
           in: path
           required: true
+          description: Community identifier
           schema:
             type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+            example:
+              title: Agricultural techniques training
+              activityType: JUNIOR_TRAINING
+              date: null
+              recurrenceRules:
+                frequency: MONTHLY
+                dayOfWeek: 6
+                weekOfMonth: 4
+                startDate: "2026-01-01"
+                endDate: "2026-12-31"
+              presence: OBLIGATORY
+              members: JUNIOR_ONLY
+      responses:
+        '201':
+          description: Activity successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+              example:
+                id: 10
+                title: Agricultural techniques training
+                activityType: JUNIOR_TRAINING
+                date: null
+                recurrenceRules:
+                  frequency: MONTHLY
+                  dayOfWeek: 6
+                  weekOfMonth: 4
+                  startDate: "2026-01-01"
+                  endDate: "2026-12-31"
+                presence: OBLIGATORY
+                members: JUNIOR_ONLY
+        '400':
+          description: Incomplete activity information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Please complete all activity information
+                status: 400
+        '404':
+          description: Community not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Community id=3 not found
+                status: 404
+
+    get:
+      summary: Get community activities
+      description: Returns the list of all planned activities for a community.
+      operationId: getCommunityActivities
+      tags:
+        - Activities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Community identifier
+          schema:
+            type: integer
+          example: 3
       responses:
         '200':
-          description: List of activities
+          description: List of community activities
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Activity"
+                  $ref: '#/components/schemas/Activity'
         '404':
-          description: Collectivity not found
+          description: Community not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Community id=3 not found
+                status: 404
 
+  
   /federation/activities:
     post:
-      description: Create an activity for all collectivities
+      summary: Create a federation activity for all communities
+      description: >
+        Creates an activity at the federation level, to which all communities
+        are invited (e.g., annual federation general assembly).
       operationId: createFederationActivity
       tags:
         - Activities
@@ -543,616 +745,515 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Activity"
+              $ref: '#/components/schemas/Activity'
             example:
-              title: Assemblée générale mensuelle - Avril 2026
-              Activitytype: GENERAL_MEETING
+              title: Federation Annual General Assembly - 2026
+              activityType: FEDERAL_MEETING
               date: null
-              frequencyDate:
-                frequency: MONTHLY
+              recurrenceRules:
+                frequency: YEARLY
                 dayOfWeek: 4
                 weekOfMonth: 2
-                startDate: 2026-01-01
-                endDate: 2026-12-31
+                startDate: "2026-01-01"
+                endDate: "2026-12-31"
               presence: OBLIGATORY
               members: ALL
       responses:
         '201':
-          description: New activity added
+          description: Federation activity successfully created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: '#/components/schemas/Activity'
               example:
-                title: Assemblée générale mensuelle - Avril 2026
-                Activitytype: GENERAL_MEETING
+                id: 25
+                title: Federation Annual General Assembly - 2026
+                activityType: FEDERAL_MEETING
                 date: null
-                frequencyDate:
-                  frequency: MONTHLY
+                recurrenceRules:
+                  frequency: YEARLY
                   dayOfWeek: 4
                   weekOfMonth: 2
-                  startDate: 2026-01-01
-                  endDate: 2026-12-31
+                  startDate: "2026-01-01"
+                  endDate: "2026-12-31"
                 presence: OBLIGATORY
                 members: ALL
         '400':
-          description: You must complete the informations about the new activity
+          description: Incomplete federation activity information
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: You must complete the informations about the new activity
+                message: Please complete all activity information
                 status: 400
 
+    get:
+      summary: Get federation activities
+      description: Returns the list of all planned activities at the federation level.
+      operationId: getFederationActivities
+      tags:
+        - Activities
+      responses:
+        '200':
+          description: List of federation activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+
+  
   /activities/{id}/attendance:
     post:
-      description: attendance record provided by id
+      summary: Record activity attendance
+      description: >
+        Records the presence or justified absence of a member at an activity.
+        A member from another community can be registered, but their presence will not
+        be counted in their annual attendance rate.
       operationId: recordAttendance
+      tags:
+        - Attendance
       parameters:
         - name: id
           in: path
           required: true
+          description: Activity identifier
           schema:
             type: integer
+          example: 10
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Attendance"
+              $ref: '#/components/schemas/Attendance'
+            example:
+              memberId: 134
+              activityId: 10
+              present: false
+              justification: Emergency medical appointment
       responses:
         '201':
-          description: attendance registration
+          description: Attendance successfully recorded
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Attendance"
-        '404':
-          description: activity or member not found
+                $ref: '#/components/schemas/Attendance'
+              example:
+                memberId: 134
+                activityId: 10
+                present: false
+                justification: Emergency medical appointment
+        '400':
+          description: Incomplete attendance information
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                message: member.id=14 is not found
+                message: Attendance information is incomplete
+                status: 400
+        '404':
+          description: Activity or member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Member id=134 not found
+                status: 404
+
+    get:
+      summary: Get activity attendance sheet
+      description: Returns the list of all attendance records for a given activity.
+      operationId: getAttendanceByActivity
+      tags:
+        - Attendance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Activity identifier
+          schema:
+            type: integer
+          example: 10
+      responses:
+        '200':
+          description: Activity attendance sheet
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attendance'
+        '404':
+          description: Activity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Activity id=10 not found
                 status: 404
 
   /members/{id}/attendance-rate:
     get:
-      description: get attendance rate of a member for a period
-      operationId: getAttendanceRate
+      summary: Calculate member attendance rate for a given period
+      description: >
+        Returns a member's attendance rate for activities of their own community
+        over a period defined by the from and to parameters.
+      operationId: getMemberAttendanceRate
+      tags:
+        - Attendance
       parameters:
         - name: id
           in: path
           required: true
+          description: Member identifier
           schema:
             type: integer
+          example: 134
         - name: from
           in: query
           required: true
+          description: Period start date (YYYY-MM-DD format)
           schema:
             type: string
             format: date
+          example: "2026-01-01"
         - name: to
           in: query
           required: true
+          description: Period end date (YYYY-MM-DD format)
           schema:
             type: string
             format: date
+          example: "2026-04-30"
       responses:
         '200':
-          description: attendance rate calculated
+          description: Calculated attendance rate
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  attendanceRate:
-                    type: number
-                    format: float
+                $ref: '#/components/schemas/AttendanceRate'
+              example:
+                attendanceRate: 85.5
         '400':
-          description: missing queryParameters
+          description: Missing period parameters
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                message: the parameters 'to' and 'from' are not present
+                message: The 'from' and 'to' parameters are required
                 status: 400
         '404':
-          description: member not found
+          description: Member not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                message: member.id=14 is not found
+                message: Member id=134 not found
                 status: 404
-
-  /collectivities/{id}/members/stats:
+                
+  /communities/{id}/members/stats:
     get:
+      summary: Global attendance statistics for a community
+      description: >
+        Returns the global attendance statistics and number of active members
+        for a community over a given period.
+      operationId: getCommunityMemberStats
+      tags:
+        - Statistics
       parameters:
         - name: id
           in: path
           required: true
+          description: Community identifier
           schema:
             type: integer
+          example: 3
         - name: startDate
           in: query
           required: true
+          description: Period start date (YYYY-MM-DD format)
           schema:
             type: string
             format: date
+          example: "2026-01-01"
         - name: endDate
           in: query
           required: true
+          description: Period end date (YYYY-MM-DD format)
           schema:
             type: string
             format: date
-      description: active members rate
+          example: "2026-04-30"
       responses:
         '200':
-          description: These are the rate of the active members
+          description: Global community statistics
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CollectivityStats"
+                $ref: '#/components/schemas/CommunityStats'
               example:
                 globalAttendanceRate: 78.5
                 totalMembers: 1240
                 activeMembers: 967
         '400':
-          description: The collectivity id={id} is not found
+          description: Missing period parameters
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: The collectivity id=111 is not found
+                message: Please provide the period dates for statistics
                 status: 400
         '404':
-          description: You must add stats periods
+          description: Community not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
               example:
-                message: You must add stats dates
+                message: Community id=3 not found
                 status: 404
 
     post:
+      summary: Submit community monthly report to federation
+      description: >
+        Allows a community president to send the monthly attendance and member count report
+        to the federation.
+      operationId: submitCommunityMonthlyReport
+      tags:
+        - Statistics
       parameters:
         - name: id
           in: path
           required: true
+          description: Community identifier
           schema:
             type: integer
+          example: 3
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CollectivityStatSummary"
+              $ref: '#/components/schemas/CommunityStatSummary'
             example:
-              month: 2025-02-01
+              month: "2026-04-01"
               attendanceRate: 79.1
               totalMembers: 1220
       responses:
         '201':
-          description: Your report is sent
+          description: Monthly report successfully sent to federation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CollectivityStatSummary"
+                $ref: '#/components/schemas/CommunityStatSummary'
               example:
-                month: 2025-02-01
+                month: "2026-04-01"
                 attendanceRate: 79.1
                 totalMembers: 1220
-        '404':
-          description: The collectivity id={id} is not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-              example:
-                message: The collectivity id=167 is not found
-                status: 400
         '400':
-          description: You must complete your rapport before sending it
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-              example:
-                message: You must complete your rapport before sending it
-                status: 400
-
-  /collectivities/{collectivityId}/members/{memberId}/statistics:
-    get:
-      description: returns a JSON object relating to the detailed statistics by id
-      operationId: getMemberStatistics
-      parameters:
-        - name: collectivityId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: memberId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: from
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-        - name: to
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-      responses:
-        '200':
-          description: SUCCESS
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Statistics'
-        '404':
-          description: memberId={memberId} not found
+          description: Incomplete report
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                message: Please complete your report before sending
+                status: 400
+        '404':
+          description: Community not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Community id=3 not found
+                status: 404
 
-components:
-  schemas:
-    Collectivity:
-      type: object
-      properties:
-        id:
-          type: integer
-        nom:
-          type: string
-        ville:
-          type: string
-        speciality:
-          type: string
-        creationDateTime:
-          type: string
-          format: date-time
+  /communities/{communityId}/members/{memberId}/statistics:
+    get:
+      summary: Detailed statistics for an active member
+      description: >
+        Returns detailed statistics for an active (non-resigned) member:
+        attendance rate, total collected amount, and potential unpaid amount over a given period.
+      operationId: getMemberStatistics
+      tags:
+        - Statistics
+      parameters:
+        - name: communityId
+          in: path
+          required: true
+          description: Community identifier
+          schema:
+            type: integer
+          example: 3
+        - name: memberId
+          in: path
+          required: true
+          description: Member identifier
+          schema:
+            type: integer
+          example: 134
+        - name: from
+          in: query
+          required: true
+          description: Period start date (YYYY-MM-DD format)
+          schema:
+            type: string
+            format: date
+          example: "2026-01-01"
+        - name: to
+          in: query
+          required: true
+          description: Period end date (YYYY-MM-DD format)
+          schema:
+            type: string
+            format: date
+          example: "2026-04-30"
+      responses:
+        '200':
+          description: Detailed member statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+              example:
+                attendanceRate: 83.3
+                totalAmountPaid: 200000.0
+                unpaidAmount: 50000.0
+        '400':
+          description: Missing period parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: The 'from' and 'to' parameters are required
+                status: 400
+        '404':
+          description: Member or community not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Member id=134 not found in community id=3
+                status: 404
 
-    Member:
-      type: object
-      required:
-        - id
-        - name
-        - birthdate
-        - gender
-        - address
-        - occupation
-        - phone
-        - email
-        - collectivityId
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        birthdate:
-          type: string
-          format: date
-        gender:
-          type: string
-          enum:
-            - male
-            - female
-        address:
-          type: string
-        occupation:
-          type: string
-        phone:
-          type: string
-        email:
-          type: string
-          format: email
-        collectivityId:
-          type: integer
+  /federation/statistics:
+    get:
+      summary: Global federation report for a given period
+      description: >
+        Returns the monthly or annual global report of the federation, consolidating
+        data from all communities: global attendance rate per community, percentage
+        of members up-to-date with contributions per community, and number of new
+        members per community over the period. This data is presented during annual
+        general assemblies.
+      operationId: getFederationStatistics
+      tags:
+        - FederationStatistics
+      parameters:
+        - name: from
+          in: query
+          required: true
+          description: Period start date (YYYY-MM-DD format)
+          schema:
+            type: string
+            format: date
+          example: "2026-01-01"
+        - name: to
+          in: query
+          required: true
+          description: Period end date (YYYY-MM-DD format)
+          schema:
+            type: string
+            format: date
+          example: "2026-04-30"
+      responses:
+        '200':
+          description: Global federation report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederationStatisticsReport'
+              example:
+                period:
+                  from: "2026-01-01"
+                  to: "2026-04-30"
+                communitiesStats:
+                  - communityId: 1
+                    communityName: Imerina Agricultural Community
+                    globalAttendanceRate: 82.5
+                    upToDateContributionRate: 91.3
+                    newMembersCount: 14
+                  - communityId: 2
+                    communityName: Agricultural Community of Vakinankaratra
+                    globalAttendanceRate: 74.0
+                    upToDateContributionRate: 85.6
+                    newMembersCount: 7
+        '400':
+          description: Missing or invalid period parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: The 'from' and 'to' parameters are required
+                status: 400
 
-    Positions:
-      type: string
-      enum:
-        - PRESIDENT
-        - VICE PRESIDENT
-        - TREASURER
-        - SECRETARY
-        - SENIOR_MEMBER
-        - JUNIOR_MEMBER
-
-    Mandate:
-      type: object
-      required:
-        - id
-        - collectivityId
-        - memberId
-        - position
-        - startDate
-        - endDate
-      properties:
-        id:
-          type: integer
-        collectivityId:
-          type: integer
-        memberId:
-          type: integer
-        position:
-          $ref: "#/components/schemas/Positions"
-        startDate:
-          type: string
-          format: date
-        endDate:
-          type: string
-          format: date
-
-    Federation:
-      type: object
-      required:
-        - id
-        - federationPresident
-        - federationVicePresident
-        - federationSecretary
-        - federationTreasurer
-        - mandateStartDate
-        - mandateEndDate
-      properties:
-        id:
-          type: integer
-        federationPresident:
-          $ref: "#/components/schemas/Member"
-        federationVicePresident:
-          $ref: "#/components/schemas/Member"
-        federationSecretary:
-          $ref: "#/components/schemas/Member"
-        federationTreasurer:
-          $ref: "#/components/schemas/Member"
-        mandateStartDate:
-          type: string
-          format: date
-        mandateEndDate:
-          type: string
-          format: date
-
-    Transaction:
-      type: object
-      required:
-        - references
-        - amount
-        - status
-      properties:
-        references:
-          type: string
-        amount:
-          type: number
-        payment:
-          type: string
-        status:
-          type: string
-          enum:
-            - SUCCESS
-            - FAILURE
-        transactionDate:
-          type: string
-          format: date-time
-
-    Contribution:
-      type: object
-      properties:
-        id:
-          type: integer
-        memberId:
-          type: integer
-        collectivityId:
-          type: integer
-        period:
-          type: string
-        contributionPeriod:
-          type: string
-          enum:
-            - MONTHLY
-            - YEARLY
-        nature:
-          type: string
-          enum:
-            - REGULAR
-            - SPECIAL_EVENT
-            - EMERGENCY
-        receiptNumber:
-          type: string
-        collectedBy:
-          type: integer
-        transaction:
-          $ref: "#/components/schemas/Transaction"
-        federationShare:
-          type: number
-        transferredToFederation:
-          type: boolean
-
-    Account:
-      type: object
-      properties:
-        id:
-          type: integer
-        typeAccount:
-          type: string
-          enum:
-            - BRED
-            - MCB
-            - BMOI
-            - BOA
-            - BGFI
-            - AFG
-            - ACCÈS BANQUE
-            - BAOBAB
-            - SIPEM
-        titulaireName:
-          type: string
-        accountDetail:
-          $ref: '#/components/schemas/AccountDetail'
-
-    AccountDetail:
-      type: object
-      properties:
-        bankCode:
-          type: string
-          minLength: 5
-          maxLength: 5
-        boxCode:
-          type: string
-          minLength: 5
-          maxLength: 5
-        accountNumber:
-          type: string
-          minLength: 11
-          maxLength: 11
-        RIBkey:
-          type: string
-          minLength: 2
-          maxLength: 2
-
-    Activity:
-      type: object
-      required:
-        - title
-        - date
-        - presence
-        - members
-      properties:
-        title:
-          type: string
-        Activitytype:
-          $ref: "#/components/schemas/ActivityType"
-        date:
-          description: Date if the activity is one time
-          type: string
-        frequencyDate:
-          description: frequency if the activity is recurrent
-          allOf:
-            - $ref: "#/components/schemas/RecurrenceRules"
-        presence:
-          type: string
-          enum:
-            - OBLIGATORY
-            - OPTIONAL
-        members:
-          type: string
-          enum:
-            - SENIOR_ONLY
-            - JUNIOR_ONLY
-            - PRESIDENT_ONLY
-            - TREASURER_ONLY
-            - ALL
-
-    ActivityType:
-      type: string
-      enum:
-        - GENERAL_MEETING
-        - JUNIOR_TRAINING
-        - EXCEPTIONAL
-        - FEDERAL_MEETING
-
-    RecurrenceRules:
-      type: object
-      required:
-        - frequency
-        - dayOfWeek
-      properties:
-        frequency:
-          type: string
-          enum:
-            - MONTHLY
-            - YEARLY
-        dayOfWeek:
-          type: integer
-          minimum: 1
-          maximum: 7
-        weekOfMonth:
-          type: integer
-          minimum: 1
-          maximum: 4
-        startDate:
-          type: string
-          format: date
-        endDate:
-          type: string
-          format: date
-
-    Attendance:
-      type: object
-      properties:
-        memberId:
-          type: integer
-        activityId:
-          type: integer
-        present:
-          type: boolean
-        justification:
-          type: string
-
-    AttendanceRate:
-      type: object
-      properties:
-        attendanceRate:
-          type: number
-          format: float
-
-    CollectivityStats:
-      type: object
-      properties:
-        globalAttendanceRate:
-          type: number
-          format: float
-        totalMembers:
-          type: integer
-          description: number of registered members
-        activeMembers:
-          type: integer
-          description: Number of active members
-
-    CollectivityStatSummary:
-      type: object
-      required:
-        - month
-        - attendanceRate
-        - totalMembers
-      properties:
-        month:
-          type: string
-          format: date
-        attendanceRate:
-          type: number
-        totalMembers:
-          type: integer
-
-    Statistics:
-      type: object
-      properties:
-        attendanceRate:
-          type: number
-        totalAmountPaid:
-          type: number
-          format: float
-        unpaidAmount:
-          type: number
-          format: float
-
-    Error:
-      type: object
-      properties:
-        message:
-          type: string
-        status:
-          type: integer
+  /federation/statistics/reports:
+    post:
+      summary: Submit consolidated federation monthly report
+      description: >
+        Allows the federation secretary to submit the consolidated monthly report
+        gathering data from all communities for archiving and presentation during
+        general assemblies.
+      operationId: submitFederationMonthlyReport
+      tags:
+        - FederationStatistics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FederationMonthlyReport'
+            example:
+              month: "2026-04-01"
+              communitiesStats:
+                - communityId: 1
+                  communityName: Imerina Agricultural Community
+                  globalAttendanceRate: 82.5
+                  upToDateContributionRate: 91.3
+                  newMembersCount: 14
+                - communityId: 2
+                  communityName: Agricultural Community of Vakinankaratra
+                  globalAttendanceRate: 74.0
+                  upToDateContributionRate: 85.6
+                  newMembersCount: 7
+      responses:
+        '201':
+          description: Federation monthly report successfully submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederationMonthlyReport'
+              example:
+                month: "2026-04-01"
+                communitiesStats:
+                  - communityId: 1
+                    communityName: Imerina Agricultural Community
+                    globalAttendanceRate: 82.5
+                    upToDateContributionRate: 91.3
+                    newMembersCount: 14
+                  - communityId: 2
+                    communityName: Agricultural Community of Vakinankaratra
+                    globalAttendanceRate: 74.0
+                    upToDateContributionRate: 85.
