@@ -15,6 +15,9 @@ public class Collectivities {
         this.gender = gender;
         this.members = members;
     }
+ 
+    public Collectivities() {
+    }
 
     public int getId() {
         return id;

@@ -45,3 +45,5 @@ CREATE TABLE collectivity_structures (
     FOREIGN KEY (treasurer_id) REFERENCES members(id),
     FOREIGN KEY (secretary_id) REFERENCES members(id)
 );
+
+INSERT INTO COLLECTIVITIES(id, location, federation_approval) VALUES (?,?,?)
