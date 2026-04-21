@@ -6,6 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
 
+<<<<<<< HEAD
 tags:
   - name: Community
     description: Management of agricultural communities
@@ -25,6 +26,46 @@ tags:
     description: Global federation statistics
 
 paths:
+  /collectivities:
+    post:
+      description: Create a new collectivity
+      operationId: newCollectivities
+      tags:
+        - Collectivity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Collectivity"
+      responses:
+        '201':
+          description: Collectivity created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collectivity"
+        '400':
+          description: Collectivity creation not satisfied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: You must complete the informations about the collectivity
+                status: 400
+        '403':
+          description: Collectivity creation not authorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: The new Collectivity need to follow all the requirement
+                status: 400
+
+
+paths:
 
   /communities:
     post:
@@ -41,11 +82,40 @@ paths:
         content:
           application/json:
             schema:
+
               $ref: '#/components/schemas/Community'
             example:
               name: Agricultural Community of Vakinankaratra
               city: Antsirabe
               specialty: Rice cultivation
+
+              type: object
+              properties:
+                sponsorId:
+                  type: integer
+                NewMemberInformations:
+                  $ref: "#/components/schemas/Member"
+                Transaction:
+                  $ref: "#/components/schemas/Transaction"
+              example:
+                sponsorId: 12
+                NewMemberInformations:
+                  id: 134
+                  name: Rivo Andrianantenaina
+                  birthdate: "1988-11-02"
+                  gender: male
+                  address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
+                  occupation: collector
+                  phone: "+261 34 12 345 67"
+                  email: rivo.andria@example.mg
+                  collectivityId: 3
+                Transaction:
+                  references: PAR-MDG-20260416-089
+                  amount: 50000
+                  payment: Orange_money
+                  status: success
+                  transactionDate: 2026-04-16T09:15:22.123Z
+
       responses:
         '201':
           description: Community successfully created
@@ -54,11 +124,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/Community'
               example:
+
                 id: 5
                 name: Agricultural Community of Vakinankaratra
                 city: Antsirabe
                 specialty: Rice cultivation
                 creationDateTime: "2026-04-21T08:00:00.000Z"
+
+                sponsorId: 12
+                NewMemberInformations:
+                  id: 134
+                  name: Rivo Andrianantenaina
+                  birthdate: "1988-11-02"
+                  gender: male
+                  address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
+                  occupation: collector
+                  phone: "+261 34 12 345 67"
+                  email: rivo.andria@example.mg
+                  collectivityId: 3
+                Transaction:
+                  references: PAR-MDG-20260416-089
+                  amount: 50000
+                  payment: Orange_money
+                  status: SUCCESS
+                  transactionDate: 2026-04-16T09:15:22.123Z
+
         '400':
           description: Incomplete community information
           content:
@@ -268,8 +358,27 @@ paths:
             type: integer
           example: 17
       responses:
+
         '204':
           description: Member successfully removed
+
+        '200':
+          description: You left
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+              example:
+                id: 17
+                name: Miora Faniry Razafimahatratra
+                birthdate: "1992-03-18"
+                gender: female
+                address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
+                occupation: collector
+                phone: "+261 32 98 765 43"
+                email: miora.faniry@example.mg
+                collectivityId: 3 
+
         '404':
           description: Member not found
           content:
@@ -321,7 +430,11 @@ paths:
                 transactionDate: "2026-04-17T07:30:34.267Z"
       responses:
         '201':
+
           description: Contribution successfully recorded
+
+          description: Your contribution is payed
+
           content:
             application/json:
               schema:
@@ -340,9 +453,15 @@ paths:
                   amount: 50000
                   payment: ORANGE_MONEY
                   status: SUCCESS
+
                   transactionDate: "2026-04-17T07:30:34.267Z"
                 federationShare: 4000
                 transferredToFederation: false
+
+                  transactionDate: 2026-04-17T07:30:34.267Z
+                federationShare: 4000
+                transferredToFederation: true
+
         '400':
           description: Incomplete information or community not found
           content:
@@ -485,6 +604,7 @@ paths:
 
   /communities/{id}/accounts:
     post:
+
       summary: Add a cash account to a community
       description: >
         Adds an account (bank, mobile money, or cash box) to a community's treasury.
@@ -492,6 +612,12 @@ paths:
       operationId: createCommunityAccount
       tags:
         - Accounts
+
+      description: add treasury account
+      operationId: createCollectivityAccount
+      tags: 
+        - Account
+
       parameters:
         - name: id
           in: path
@@ -522,6 +648,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Account'
               example:
+
                 id: 8
                 typeAccount: BOA
                 holderName: Imerina Agricultural Community
@@ -531,6 +658,95 @@ paths:
                   accountNumber: "00123456789"
                   ribKey: "14"
                 balance: 0
+
+                message: Collectivity.id=19 is not found
+                status: 404
+
+    get:
+      description: get account
+      tags: 
+        - Account
+      operationId: getCollectivityAccounts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: find account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Collectivity.id={id} is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Collectivity.id=19 is not found
+                status: 404
+
+  /collectivities/{id}/activities:
+    post:
+      tags:
+        - Activities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Activity"
+            example:
+              title: Formation techniques agricoles
+              Activitytype: JUNIOR_TRAINING
+              date: "2026-04-28"
+              frequencyDate:
+                frequency: MONTHLY
+                dayOfWeek: 6
+                weekOfMonth: 4
+                startDate: "2026-01-01"
+                endDate: "2026-12-31"
+              presence: OBLIGATORY
+              members: JUNIOR_ONLY
+      responses:
+        '201':
+          description: New activity added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Activity"
+              example:
+                title: Assemblée générale mensuelle - Avril 2026
+                Activitytype: GENERAL_MEETING
+                date: null
+                frequencyDate:
+                  frequency: MONTHLY
+                  dayOfWeek: 4
+                  weekOfMonth: 2
+                  startDate: "2026-01-01"
+                  endDate: "2026-12-31"
+                presence: OBLIGATORY
+                members: ALL
+        '404':
+          description: The collectivity from id={id} is not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: The collectivity from id=909 is not found
+                status: 404
+
         '400':
           description: Invalid account information or cash box already exists
           content:
@@ -807,11 +1023,17 @@ paths:
   
   /activities/{id}/attendance:
     post:
+
       summary: Record activity attendance
       description: >
         Records the presence or justified absence of a member at an activity.
         A member from another community can be registered, but their presence will not
         be counted in their annual attendance rate.
+
+      description: attendance record provided by id
+      tags: 
+        - Attendances
+
       operationId: recordAttendance
       tags:
         - Attendance
@@ -900,6 +1122,7 @@ paths:
 
   /members/{id}/attendance-rate:
     get:
+
       summary: Calculate member attendance rate for a given period
       description: >
         Returns a member's attendance rate for activities of their own community
@@ -907,6 +1130,12 @@ paths:
       operationId: getMemberAttendanceRate
       tags:
         - Attendance
+
+      tags: 
+        - Attendances
+      description: get attendance rate of a member for a period
+      operationId: getAttendanceRate
+
       parameters:
         - name: id
           in: path
@@ -961,11 +1190,13 @@ paths:
                 
   /communities/{id}/members/stats:
     get:
+
       summary: Global attendance statistics for a community
       description: >
         Returns the global attendance statistics and number of active members
         for a community over a given period.
       operationId: getCommunityMemberStats
+
       tags:
         - Statistics
       parameters:
@@ -1003,22 +1234,35 @@ paths:
                 globalAttendanceRate: 78.5
                 totalMembers: 1240
                 activeMembers: 967
+
         '400':
           description: Missing period parameters
+
+        '404':
+          description: The collectivity id={id} is not found
+
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
+
                 message: Please provide the period dates for statistics
                 status: 400
         '404':
           description: Community not found
+
+                message: The collectivity id=111 is not found
+                status: 404
+        '400':
+          description: You must add stats periods
+
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
+
                 message: Community id=3 not found
                 status: 404
 
@@ -1028,6 +1272,12 @@ paths:
         Allows a community president to send the monthly attendance and member count report
         to the federation.
       operationId: submitCommunityMonthlyReport
+
+                message: You must add stats dates
+                status: 400
+
+    post:
+
       tags:
         - Statistics
       parameters:
@@ -1060,7 +1310,57 @@ paths:
                 attendanceRate: 79.1
                 totalMembers: 1220
         '400':
+
           description: Incomplete report
+
+          description: You must complete your rapport before sending it
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: You must complete your rapport before sending it
+                status: 400
+
+  /collectivities/{collectivityId}/members/{memberId}/statistics:
+    get:
+      tags:
+        - Statistics
+      description: returns a JSON object relating to the detailed statistics by id
+      operationId: getMemberStatistics
+      parameters:
+        - name: collectivityId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+        '404':
+          description: memberId={memberId} not found
+
           content:
             application/json:
               schema:
@@ -1257,3 +1557,298 @@ paths:
                     communityName: Agricultural Community of Vakinankaratra
                     globalAttendanceRate: 74.0
                     upToDateContributionRate: 85.
+
+    Positions:
+      type: string
+      enum:
+        - PRESIDENT
+        - VICE_PRESIDENT
+        - TREASURER
+        - SECRETARY
+        - SENIOR_MEMBER
+        - JUNIOR_MEMBER
+
+    Mandate:
+      type: object
+      required:
+        - id
+        - collectivityId
+        - memberId
+        - position
+        - startDate
+        - endDate
+      properties:
+        id:
+          type: integer
+        collectivityId:
+          type: integer
+        memberId:
+          type: integer
+        position:
+          $ref: "#/components/schemas/Positions"
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+
+    Federation:
+      type: object
+      required:
+        - id
+        - federationPresident
+        - federationVicePresident
+        - federationSecretary
+        - federationTreasurer
+        - mandateStartDate
+        - mandateEndDate
+      properties:
+        id:
+          type: integer
+        federationPresident:
+          $ref: "#/components/schemas/Member"
+        federationVicePresident:
+          $ref: "#/components/schemas/Member"
+        federationSecretary:
+          $ref: "#/components/schemas/Member"
+        federationTreasurer:
+          $ref: "#/components/schemas/Member"
+        mandateStartDate:
+          type: string
+          format: date
+        mandateEndDate:
+          type: string
+          format: date
+
+    Transaction:
+      type: object
+      required:
+        - references
+        - amount
+        - status
+      properties:
+        references:
+          type: string
+        amount:
+          type: number
+        payment:
+          type: string
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - FAILURE
+        transactionDate:
+          type: string
+          format: date-time
+
+    Contribution:
+      type: object
+      properties:
+        id:
+          type: integer
+        memberId:
+          type: integer
+        collectivityId:
+          type: integer
+        period:
+          type: string
+        contributionPeriod:
+          type: string
+          enum:
+            - MONTHLY
+            - YEARLY
+        nature:
+          type: string
+          enum:
+            - REGULAR
+            - SPECIAL_EVENT
+            - EMERGENCY
+        receiptNumber:
+          type: string
+        collectedBy:
+          type: integer
+        transaction:
+          $ref: "#/components/schemas/Transaction"
+        federationShare:
+          type: number
+        transferredToFederation:
+          type: boolean
+
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+        typeAccount:
+          type: string
+          enum:
+            - BRED
+            - MCB
+            - BMOI
+            - BOA
+            - BGFI
+            - AFG
+            - ACCÈS BANQUE
+            - BAOBAB
+            - SIPEM
+        titulaireName:
+          type: string
+        accountDetail:
+          $ref: '#/components/schemas/AccountDetail'
+
+    AccountDetail:
+      type: object
+      properties:
+        bankCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+        boxCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+        accountNumber:
+          type: string
+          minLength: 11
+          maxLength: 11
+        RIBkey:
+          type: string
+          minLength: 2
+          maxLength: 2
+
+    Activity:
+      type: object
+      required:
+        - title
+        - presence
+        - members
+      properties:
+        title:
+          type: string
+        Activitytype:
+          $ref: "#/components/schemas/ActivityType"
+        date:
+          description: Date if the activity is one time
+          type: string
+          format: date
+        frequencyDate:
+          description: frequency if the activity is recurrent
+          allOf:
+            - $ref: "#/components/schemas/RecurrenceRules"
+        presence:
+          type: string
+          enum:
+            - OBLIGATORY
+            - OPTIONAL
+        members:
+          type: string
+          enum:
+            - SENIOR_ONLY
+            - JUNIOR_ONLY
+            - PRESIDENT_ONLY
+            - TREASURER_ONLY
+            - ALL
+
+    ActivityType:
+      type: string
+      enum:
+        - GENERAL_MEETING
+        - JUNIOR_TRAINING
+        - EXCEPTIONAL
+        - FEDERAL_MEETING
+
+    RecurrenceRules:
+      type: object
+      required:
+        - frequency
+        - dayOfWeek
+      properties:
+        frequency:
+          type: string
+          enum:
+            - MONTHLY
+            - YEARLY
+        dayOfWeek:
+          type: integer
+          minimum: 1
+          maximum: 7
+        weekOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 4
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+
+    Attendance:
+      type: object
+      properties:
+        memberId:
+          type: integer
+        activityId:
+          type: integer
+        present:
+          type: boolean
+        justification:
+          type: string
+
+    AttendanceRate:
+      type: object
+      properties:
+        attendanceRate:
+          type: number
+          format: float
+
+    CollectivityStats:
+      type: object
+      properties:
+        globalAttendanceRate:
+          type: number
+          format: float
+        totalMembers:
+          type: integer
+          description: number of registered members
+        activeMembers:
+          type: integer
+          description: Number of active members
+
+    CollectivityStatSummary:
+      type: object
+      required:
+        - month
+        - attendanceRate
+        - totalMembers
+      properties:
+        month:
+          type: string
+          format: date
+        attendanceRate:
+          type: number
+        totalMembers:
+          type: integer
+
+    Statistics:
+      type: object
+      properties:
+        attendanceRate:
+          type: number
+        totalAmountPaid:
+          type: number
+          format: float
+        unpaidAmount:
+          type: number
+          format: float
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+
