@@ -18,20 +18,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Collectivity'
+              $ref: "#/components/schemas/Collectivity"
       responses:
         '201':
           description: Collectivity created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Collectivity'
+                $ref: "#/components/schemas/Collectivity"
         '400':
           description: Collectivity creation not satisfied
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               example:
                 message: You must complete the informations about the collectivity
                 status: 400
@@ -40,7 +40,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               example:
                 message: The new Collectivity need to follow all the requirement
 
@@ -109,7 +109,7 @@ paths:
                   birthdate: 1988-11-02
                   gender: male
                   address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
-                  occupation: teacher
+                  occupation: collector
                   phone: "+261 34 12 345 67"
                   email: rivo.andria@example.mg
                   collectivityId: 3
@@ -347,6 +347,7 @@ paths:
           schema:
             type: integer
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -588,6 +589,8 @@ paths:
   /activities/{id}/attendance:
     post:
       description: attendance record provided by id
+      tags: 
+        - Activities
       operationId: recordAttendance
       parameters:
         - name: id
@@ -702,7 +705,7 @@ paths:
                 globalAttendanceRate: 78.5
                 totalMembers: 1240
                 activeMembers: 967
-        '400':
+        '404':
           description: The collectivity id={id} is not found
           content:
             application/json:
@@ -710,8 +713,8 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 message: The collectivity id=111 is not found
-                status: 400
-        '404':
+                status: 404
+        '400':
           description: You must add stats periods
           content:
             application/json:
@@ -719,7 +722,7 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 message: You must add stats dates
-                status: 404
+                status: 400
 
     post:
       parameters:
@@ -1038,6 +1041,7 @@ components:
         date:
           description: Date if the activity is one time
           type: string
+          format: date
         frequencyDate:
           description: frequency if the activity is recurrent
           allOf:
