@@ -43,6 +43,7 @@ paths:
                 $ref: "#/components/schemas/Error"
               example:
                 message: The new Collectivity need to follow all the requirement
+                status: 400
 
   /collectivities/{id}/members:
     post:
@@ -74,7 +75,7 @@ paths:
                 NewMemberInformations:
                   id: 134
                   name: Rivo Andrianantenaina
-                  birthdate: 1988-11-02
+                  birthdate: "1988-11-02"
                   gender: male
                   address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
                   occupation: collector
@@ -106,7 +107,7 @@ paths:
                 NewMemberInformations:
                   id: 134
                   name: Rivo Andrianantenaina
-                  birthdate: 1988-11-02
+                  birthdate: "1988-11-02"
                   gender: male
                   address: Lot II M 68 Bis, Ambohimanarina, Antananarivo 101
                   occupation: collector
@@ -159,7 +160,7 @@ paths:
             example:
               id: 17
               name: Miora Faniry Razafimahatratra
-              birthdate: 1992-03-18
+              birthdate: "1992-03-18"
               gender: female
               address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
               occupation: collector
@@ -176,7 +177,7 @@ paths:
               example:
                 id: 17
                 name: Miora Faniry Razafimahatratra
-                birthdate: 1992-03-18
+                birthdate: "1992-03-18"
                 gender: female
                 address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
                 occupation: collector
@@ -214,12 +215,13 @@ paths:
               example:
                 id: 17
                 name: Miora Faniry Razafimahatratra
-                birthdate: 1992-03-18
+                birthdate: "1992-03-18"
                 gender: female
                 address: Lot VA 15 Ter, Andoharanofotsy, Antananarivo 102
                 occupation: collector
                 phone: "+261 32 98 765 43"
                 email: miora.faniry@example.mg
+                collectivityId: 3 
         '404':
           description: Member not found
           content:
@@ -262,7 +264,7 @@ paths:
                 status: SUCCESS
                 transactionDate: 2026-04-17T07:30:34.267Z
       responses:
-        '200':
+        '201':
           description: Your contribution is payed
           content:
             application/json:
@@ -282,6 +284,8 @@ paths:
                   payment: ORANGE_MONEY
                   status: SUCCESS
                   transactionDate: 2026-04-17T07:30:34.267Z
+                federationShare: 4000
+                transferredToFederation: true
         '400':
           description: The collectivity from id={id} is not found
           content:
@@ -465,17 +469,17 @@ paths:
             example:
               title: Formation techniques agricoles
               Activitytype: JUNIOR_TRAINING
-              date: 2026-04-28
+              date: "2026-04-28"
               frequencyDate:
                 frequency: MONTHLY
                 dayOfWeek: 6
                 weekOfMonth: 4
-                startDate: 2026-01-01
-                endDate: 2026-12-31
+                startDate: "2026-01-01"
+                endDate: "2026-12-31"
               presence: OBLIGATORY
               members: JUNIOR_ONLY
       responses:
-        '200':
+        '201':
           description: New activity added
           content:
             application/json:
@@ -489,8 +493,8 @@ paths:
                   frequency: MONTHLY
                   dayOfWeek: 4
                   weekOfMonth: 2
-                  startDate: 2026-01-01
-                  endDate: 2026-12-31
+                  startDate: "2026-01-01"
+                  endDate: "2026-12-31"
                 presence: OBLIGATORY
                 members: ALL
         '404':
@@ -559,8 +563,8 @@ paths:
                 frequency: MONTHLY
                 dayOfWeek: 4
                 weekOfMonth: 2
-                startDate: 2026-01-01
-                endDate: 2026-12-31
+                startDate: "2026-01-01"
+                endDate: "2026-12-31"
               presence: OBLIGATORY
               members: ALL
       responses:
@@ -578,8 +582,8 @@ paths:
                   frequency: MONTHLY
                   dayOfWeek: 4
                   weekOfMonth: 2
-                  startDate: 2026-01-01
-                  endDate: 2026-12-31
+                  startDate: "2026-01-01"
+                  endDate: "2026-12-31"
                 presence: OBLIGATORY
                 members: ALL
         '400':
@@ -884,7 +888,7 @@ components:
       type: string
       enum:
         - PRESIDENT
-        - VICE PRESIDENT
+        - VICE_PRESIDENT
         - TREASURER
         - SECRETARY
         - SENIOR_MEMBER
@@ -1044,7 +1048,6 @@ components:
       type: object
       required:
         - title
-        - date
         - presence
         - members
       properties:
