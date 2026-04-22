@@ -1,4 +1,4 @@
-package com.example.Ex.DAO;
+package main.java.com.example.Ex.DAO;
 
 public class Members {
     int id;
