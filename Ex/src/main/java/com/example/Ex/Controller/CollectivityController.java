@@ -11,7 +11,6 @@ public class CollectivityController {
     private ResponseEntity<?> createCollectivityEntity(Collectivities collectivity){
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
-
             
         } catch (BadRequestException e) {
             throw new RuntimeException(e.getMessage());
