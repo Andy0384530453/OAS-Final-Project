@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -22,10 +20,18 @@ public class ApiController {
     private final CollectivityService collectivityService;
     private final MemberService memberService;
 
-    public ApiController(CollectivityService collectivityService, MemberService memberService) {
+        private final MembershipFeeService membershipFeeService;
+    private final MemberPaymentService memberPaymentService;
+
+    public ApiController(CollectivityService collectivityService,
+    MemberService memberService, MembershipFeeService membershipFeeService, MemberPaymentService memberPaymentService) {
         this.collectivityService = collectivityService;
         this.memberService = memberService;
+        this.membershipFeeService = membershipFeeService;
+        this.memberPaymentService = memberPaymentService;
     }
+
+
 
     @PostMapping("/collectivities")
     public ResponseEntity<List<Collectivity>> createCollectivities(@RequestBody List<CreateCollectivity> collectivities) throws Exception {
@@ -59,18 +65,7 @@ public class ApiController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
     }
 
-    private final MembershipFeeService membershipFeeService;
-    private final MemberPaymentService memberPaymentService;
 
-    public ApiController(CollectivityService collectivityService,
-                         MemberService memberService,
-                         MembershipFeeService membershipFeeService,
-                         MemberPaymentService memberPaymentService) {
-        this.collectivityService = collectivityService;
-        this.memberService = memberService;
-        this.membershipFeeService = membershipFeeService;
-        this.memberPaymentService = memberPaymentService;
-    }
 
     @GetMapping("/collectivities/{id}/membershipFees")
     public ResponseEntity<?> getMembershipFees(@PathVariable String id) throws Exception {

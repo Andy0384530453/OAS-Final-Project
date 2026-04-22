@@ -26,14 +26,21 @@ public class CollectivityRepository {
 
 
 
-    public void createCollectivity(String location, boolean federationApproval) throws Exception {
-        String sql = "INSERT INTO collectivities (id, location, federation_approval) VALUES (UUID(), ?, ?)";
+    public String createCollectivity(String location, boolean federationApproval)  {
+        String sql = "INSERT INTO collectivities (id, location, federation_approval) VALUES (gen_random_uuid(), ?, ?) RETURNING id";
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, location);
             ps.setBoolean(2, federationApproval);
-            ps.executeUpdate();
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("id" );
+        
+            }
+            
+        }catch(SQLException e){
+            throw new RuntimeException(e);
         }
     }
 

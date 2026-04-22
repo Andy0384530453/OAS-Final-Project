@@ -42,7 +42,7 @@ public class MemberPaymentRepository {
 
     public List<MemberPayment> findByMemberId(String memberId) throws SQLException {
         List<MemberPayment> payments = new ArrayList<>();
-        String sql = "SELECT * FROM member_payments WHERE member_id = ?";
+        String sql = "SELECT id, member_id, amount, payment_mode, account_credited_id, creation_date, membership_fee_id FROM member_payments WHERE member_id = ?";
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

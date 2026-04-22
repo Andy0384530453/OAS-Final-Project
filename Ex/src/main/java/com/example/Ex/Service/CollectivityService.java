@@ -6,7 +6,8 @@ import com.example.Ex.DTO.CreateCollectivityStructure;
 import com.example.Ex.Entity.Collectivity;
 import com.example.Ex.Entity.CollectivityTransaction;
 import com.example.Ex.Repository.CollectivityRepository;
-import com.example.Ex.Repository.CollectivityStructureRepository;
+import com.example.Ex.Repository.CollectivityTransactionRepository;
+import com.example.Ex.Repository.FinancialAccountRepository;
 import com.example.Ex.Repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,17 +18,18 @@ import java.util.List;
 public class CollectivityService {
 
     private final CollectivityRepository collectivityRepository;
-    private final CollectivityStructureRepository structureRepository;
+    private final FinancialAccountRepository financialAccountRepository;
     private final MemberRepository memberRepository;
+    private final CollectivityTransactionRepository collectivityTransactionRepository;
 
     public CollectivityService(
             CollectivityRepository collectivityRepository,
-            CollectivityStructureRepository structureRepository,
-            MemberRepository memberRepository
+            MemberRepository memberRepository, FinancialAccountRepository financialAccountRepository, CollectivityTransactionRepository collectivityTransactionRepository
     ) {
         this.collectivityRepository = collectivityRepository;
-        this.structureRepository = structureRepository;
+        this.financialAccountRepository = financialAccountRepository;
         this.memberRepository = memberRepository;
+        this.collectivityTransactionRepository = collectivityTransactionRepository;
     }
 
     public List<Collectivity> createCollectivities(List<CreateCollectivity> collectivities) throws Exception {
@@ -111,8 +113,7 @@ public class CollectivityService {
             throw new RuntimeException("Collectivity not found");
         }
 
-        List<CollectivityTransaction> transactions =
-                transactionRepository.findByCollectivityIdAndDateRange(id, from, to);
+        List<CollectivityTransaction> transactions = collectivityTransactionRepository.findByCollectivityIdAndDateRange(id, from, to);
 
         List<CollectivityTransactionDTO> result = new ArrayList<>();
         for (CollectivityTransaction tx : transactions) {

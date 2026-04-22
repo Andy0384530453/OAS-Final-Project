@@ -121,4 +121,5 @@ CREATE TABLE collectivity_transactions (
     FOREIGN KEY (member_debited_id) REFERENCES members(id)
 );
 
+SELECT * from Members;
 

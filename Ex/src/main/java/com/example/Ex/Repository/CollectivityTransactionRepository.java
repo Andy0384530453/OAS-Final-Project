@@ -39,7 +39,7 @@ public class CollectivityTransactionRepository {
 
     public List<CollectivityTransaction> findByCollectivityIdAndDateRange(String collectivityId, String from, String to) throws SQLException {
         List<CollectivityTransaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM collectivity_transactions WHERE collectivity_id = ? " +
+        String sql = "SELECT id, collectivity_id, creation_date, amount, payment_mode, account_credited_id, member_debited_id FROM collectivity_transactions WHERE collectivity_id = ? " +
                 "AND creation_date BETWEEN ? AND ? " +
                 "ORDER BY creation_date";
 

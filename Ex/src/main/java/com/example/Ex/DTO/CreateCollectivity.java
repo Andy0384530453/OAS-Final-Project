@@ -41,4 +41,6 @@ public class CreateCollectivity {
     public void setStructure(CreateCollectivityStructure structure) {
         this.structure = structure;
     }
+
+    
 }
