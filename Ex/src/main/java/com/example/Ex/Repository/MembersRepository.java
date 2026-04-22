@@ -1,10 +1,8 @@
-package main.java.com.example.Ex.Repository;
+package com.example.Ex.Repository;
 
 import java.sql.SQLException;
 
-import main.java.com.example.Ex.DAO.Collectivities;
-
-
+import com.example.Ex.DAO.Collectivities;
 
 public class MembersRepository {
     public Collectivities addNewCollectivity(Collectivities collectivity){

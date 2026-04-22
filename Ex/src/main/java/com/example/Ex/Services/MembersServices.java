@@ -1,4 +1,4 @@
-package main.java.com.example.Ex.Services;
+package com.example.Ex.Services;
 
 public class MembersServices {
     

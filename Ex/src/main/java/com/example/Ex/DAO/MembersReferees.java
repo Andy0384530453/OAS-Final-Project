@@ -1,4 +1,4 @@
-package main.java.com.example.Ex.DAO;
+package com.example.Ex.DAO;
 
 
 public class MembersReferees {
