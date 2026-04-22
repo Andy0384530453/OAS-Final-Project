@@ -9,6 +9,7 @@ public class MobileBankingAccount extends FinancialAccount {
     private String mobileBankingService;
     private String mobileNumber;
 
+    public MobileBankingAccount(){}
     public MobileBankingAccount(String holderName) {
         this.holderName = holderName;
     }

@@ -3,7 +3,6 @@ package com.example.Ex.Service;
 import com.example.Ex.DTO.CreateCollectivity;
 import com.example.Ex.DTO.CreateCollectivityStructure;
 import com.example.Ex.Entity.Collectivity;
-import com.example.Ex.Entity.Member;
 import com.example.Ex.Repository.CollectivityRepository;
 import com.example.Ex.Repository.CollectivityStructureRepository;
 import com.example.Ex.Repository.MemberRepository;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class CollectivityService {
@@ -28,10 +26,6 @@ public class CollectivityService {
         this.collectivityRepository = collectivityRepository;
         this.structureRepository = structureRepository;
         this.memberRepository = memberRepository;
-    }
-
-    private String generateId() {
-        return UUID.randomUUID().toString();
     }
 
     public List<Collectivity> createCollectivities(List<CreateCollectivity> collectivities) throws Exception {
@@ -52,10 +46,10 @@ public class CollectivityService {
             throw new RuntimeException("Structure missing");
         }
 
-        String presidentId    = structureDTO.getPresident();
+        String presidentId = structureDTO.getPresident();
         String vicePresidentId = structureDTO.getVicePresident();
-        String treasurerId    = structureDTO.getTreasurer();
-        String secretaryId    = structureDTO.getSecretary();
+        String treasurerId = structureDTO.getTreasurer();
+        String secretaryId = structureDTO.getSecretary();
 
         if (presidentId == null || vicePresidentId == null || treasurerId == null || secretaryId == null) {
             throw new RuntimeException("Structure missing");
@@ -64,12 +58,10 @@ public class CollectivityService {
         validateMembersExist(dto.getMembers());
         validateStructureMembersExist(presidentId, vicePresidentId, treasurerId, secretaryId);
 
-        String id = generateId();
 
-        collectivityRepository.createCollectivity(id, dto.getLocation(), dto.isFederationApproval());
-        structureRepository.createStructure(id, presidentId, vicePresidentId, treasurerId, secretaryId);
+        collectivityRepository.createCollectivity(dto.getLocation(), dto.isFederationApproval());
 
-        return new Collectivity(id, null, null, dto.getLocation(), null, dto.isFederationApproval());
+        return new Collectivity(null, null, null, dto.getLocation(), null, dto.isFederationApproval());
     }
 
     private void validateMembersExist(List<String> memberIds) throws Exception {

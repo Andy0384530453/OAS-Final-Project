@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @Repository
 public class CollectivityRepository {
@@ -22,19 +23,19 @@ public class CollectivityRepository {
         return dbConnection.getDBConnection();
     }
 
-    public void createCollectivity(String id, String location, boolean federationApproval) throws Exception {
-        String sql = "INSERT INTO collectivities (id, location, federation_approval) VALUES (?, ?, ?)";
+
+
+
+    public void createCollectivity(String location, boolean federationApproval) throws Exception {
+        String sql = "INSERT INTO collectivities (id, location, federation_approval) VALUES (UUID(), ?, ?)";
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, id);
-            ps.setString(2, location);
-            ps.setBoolean(3, federationApproval);
+            ps.setString(1, location);
+            ps.setBoolean(2, federationApproval);
             ps.executeUpdate();
         }
     }
-
 
     public boolean existsByNumber(String number) throws SQLException {
         String sql = "SELECT id FROM collectivities WHERE number = ?";
