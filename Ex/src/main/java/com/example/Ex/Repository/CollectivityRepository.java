@@ -35,7 +35,7 @@ public class CollectivityRepository {
         }
     }
 
-    // Add to CollectivityRepository.java
+
     public boolean existsByNumber(String number) throws SQLException {
         String sql = "SELECT id FROM collectivities WHERE number = ?";
         try (Connection con = getConnection();
