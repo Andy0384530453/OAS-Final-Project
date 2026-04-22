@@ -66,21 +66,22 @@ public class MembershipFeeRepository {
     }
 
     public MembershipFee findById(String id) throws SQLException {
-        String sql = "SELECT * FROM membership_fees WHERE id = ?";
+        String sql = "SELECT id, collectivity_id, eligible_from, frequency, amount, label, status FROM membership_fees WHERE id = ?";
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, id);
+            MembershipFee membershipFee = new MembershipFee();       
+                            
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new MembershipFee(
-                            rs.getString("id"),
-                            rs.getString("collectivity_id"),
-                            rs.getDate("eligible_from") != null ? rs.getDate("eligible_from").toString() : null,
-                            rs.getString("frequency"),
-                            rs.getDouble("amount"),
-                            rs.getString("label"),
-                            rs.getString("status")
-                    );
+                    membershipFee.setId(rs.getString("id"));
+                    membershipFee.setCollectivityId(rs.getString("collectivity_id"));
+                    membershipFee.setEligibleFrom(rs.getDate("eligible_from") != null ? rs.getDate("eligible_from").toString() : null);
+                    membershipFee.setFrequency(rs.getString("frequency"));
+                    membershipFee.setAmount(rs.getDouble("amount"));
+                    membershipFee.setLabel(rs.getString("status"));
+                    
+                    return membershipFee;
                 }
             }
         }
