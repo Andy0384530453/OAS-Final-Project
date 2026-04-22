@@ -1,5 +1,6 @@
 package com.example.Ex;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -9,28 +10,22 @@ import java.sql.SQLException;
 @Component
 public class DBConnection {
 
-    private String url = System.getenv("URL");
-    private String user = System.getenv("USER");
-    private String mdp = System.getenv("MDP");
+    private final String url;
+    private final String user;
+    private final String mdp;
 
+    public DBConnection() {
+        Dotenv dotenv = Dotenv.configure()
+                .directory("./")
+                .ignoreIfMissing()
+                .load();
 
-    public String getUrl() {
-        return url;
+        this.url  = dotenv.get("URL");
+        this.user = dotenv.get("USER");
+        this.mdp  = dotenv.get("MDP");
     }
 
-    public String getUser() {
-        return user;
+    public Connection getDBConnection() throws SQLException {
+        return DriverManager.getConnection(url, user, mdp);
     }
-
-    public String getMdp() {
-        return mdp;
-    }
-
-
-    public Connection getDBConnection () throws SQLException {
-        return DriverManager.getConnection(url,user,mdp);
-
-    }
-
-
 }

@@ -30,14 +30,15 @@ public class CollectivityService {
         this.memberRepository = memberRepository;
     }
 
+    private String generateId() {
+        return UUID.randomUUID().toString();
+    }
+
     public List<Collectivity> createCollectivities(List<CreateCollectivity> collectivities) throws Exception {
         List<Collectivity> result = new ArrayList<>();
-
         for (CreateCollectivity dto : collectivities) {
-            Collectivity collectivity = createSingleCollectivity(dto);
-            result.add(collectivity);
+            result.add(createSingleCollectivity(dto));
         }
-
         return result;
     }
 
@@ -51,40 +52,62 @@ public class CollectivityService {
             throw new RuntimeException("Structure missing");
         }
 
-        String presidentId = structureDTO.getPresident();
+        String presidentId    = structureDTO.getPresident();
         String vicePresidentId = structureDTO.getVicePresident();
-        String treasurerId = structureDTO.getTreasurer();
-        String secretaryId = structureDTO.getSecretary();
+        String treasurerId    = structureDTO.getTreasurer();
+        String secretaryId    = structureDTO.getSecretary();
 
         if (presidentId == null || vicePresidentId == null || treasurerId == null || secretaryId == null) {
             throw new RuntimeException("Structure missing");
         }
 
-        List<String> memberIds = dto.getMembers();
-        if (memberIds != null) {
-            for (String memberId : memberIds) {
-                Member m = memberRepository.findById(memberId);
-                if (m == null) {
-                    throw new RuntimeException("Member not found: " + memberId);
-                }
-            }
-        }
+        validateMembersExist(dto.getMembers());
+        validateStructureMembersExist(presidentId, vicePresidentId, treasurerId, secretaryId);
 
-        Member president = memberRepository.findById(presidentId);
-        Member vicePresident = memberRepository.findById(vicePresidentId);
-        Member treasurer = memberRepository.findById(treasurerId);
-        Member secretary = memberRepository.findById(secretaryId);
-
-        if (president == null || vicePresident == null || treasurer == null || secretary == null) {
-            throw new RuntimeException("Structure member not found");
-        }
-
-        String id = UUID.randomUUID().toString();
+        String id = generateId();
 
         collectivityRepository.createCollectivity(id, dto.getLocation(), dto.isFederationApproval());
-
         structureRepository.createStructure(id, presidentId, vicePresidentId, treasurerId, secretaryId);
 
-        return new Collectivity(id, null, dto.getLocation(), null, dto.isFederationApproval());
+        return new Collectivity(id, null, null, dto.getLocation(), null, dto.isFederationApproval());
+    }
+
+    private void validateMembersExist(List<String> memberIds) throws Exception {
+        if (memberIds == null || memberIds.isEmpty()) return;
+        for (String memberId : memberIds) {
+            if (memberRepository.findById(memberId) == null) {
+                throw new RuntimeException("Member not found: " + memberId);
+            }
+        }
+    }
+
+    private void validateStructureMembersExist(String presidentId, String vicePresidentId,
+                                               String treasurerId, String secretaryId) throws Exception {
+        List<String> ids = List.of(presidentId, vicePresidentId, treasurerId, secretaryId);
+        for (String id : ids) {
+            if (memberRepository.findById(id) == null) {
+                throw new RuntimeException("Structure member not found: " + id);
+            }
+        }
+    }
+
+    public Collectivity assignNumberAndName(String id, String number, String name) throws Exception {
+        Collectivity existing = collectivityRepository.findByIdWithDetails(id);
+        if (existing == null) {
+            throw new RuntimeException("Collectivity not found");
+        }
+        if (collectivityRepository.hasNumberAndName(id)) {
+            throw new RuntimeException("Collectivity already has number and name assigned");
+        }
+        if (collectivityRepository.existsByNumber(number)) {
+            throw new RuntimeException("Number already exists: " + number);
+        }
+        if (collectivityRepository.existsByName(name)) {
+            throw new RuntimeException("Name already exists: " + name);
+        }
+
+        collectivityRepository.assignNumberAndName(id, number, name);
+
+        return collectivityRepository.findByIdWithDetails(id);
     }
 }

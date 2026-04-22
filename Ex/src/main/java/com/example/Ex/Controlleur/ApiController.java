@@ -1,7 +1,6 @@
 package com.example.Ex.Controlleur;
 
-
-
+import com.example.Ex.DTO.AssignRequest;
 import com.example.Ex.DTO.CreateCollectivity;
 import com.example.Ex.DTO.CreateMember;
 import com.example.Ex.Entity.Collectivity;
@@ -26,32 +25,39 @@ public class ApiController {
     }
 
     @PostMapping("/collectivities")
-    public ResponseEntity<?> createCollectivities(@RequestBody List<CreateCollectivity> collectivities) {
-        try {
-            List<Collectivity> result = collectivityService.createCollectivities(collectivities);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("not found")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<List<Collectivity>> createCollectivities(@RequestBody List<CreateCollectivity> collectivities) throws Exception {
+        List<Collectivity> result = collectivityService.createCollectivities(collectivities);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PostMapping("/members")
-    public ResponseEntity<?> createMembers(@RequestBody List<CreateMember> members) {
-        try {
-            List<Member> result = memberService.createMembers(members);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("not found")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    public ResponseEntity<List<Member>> createMembers(@RequestBody List<CreateMember> members) throws Exception {
+        List<Member> result = memberService.createMembers(members);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    }
+
+    @PutMapping("/collectivities/{id}/attribution")
+    public ResponseEntity<Collectivity> assignNumberAndName(
+            @PathVariable String id,
+            @RequestBody AssignRequest request) throws Exception {
+        Collectivity result = collectivityService.assignNumberAndName(id, request.getNumber(), request.getName());
+        return ResponseEntity.ok(result);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntime(RuntimeException e) {
+        String msg = e.getMessage();
+        if (msg != null && msg.contains("not found")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
         }
+        if (msg != null && (msg.contains("already has") || msg.contains("already exists"))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

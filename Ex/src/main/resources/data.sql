@@ -47,3 +47,7 @@ CREATE TABLE collectivity_structures (
 );
 
 INSERT INTO COLLECTIVITIES(id, location, federation_approval) VALUES (?,?,?)
+
+
+ALTER TABLE collectivities ADD COLUMN IF NOT EXISTS number VARCHAR(255) UNIQUE;
+ALTER TABLE collectivities ADD COLUMN IF NOT EXISTS name VARCHAR(255) UNIQUE;

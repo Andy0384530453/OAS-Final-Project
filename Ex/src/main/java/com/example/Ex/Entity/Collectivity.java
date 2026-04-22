@@ -3,76 +3,37 @@ package com.example.Ex.Entity;
 public class Collectivity {
 
     private String id;
-    private String name;
+    private String number;  // NEW - unique number from federation
+    private String name;    // NEW - unique name
     private String location;
     private String specialty;
     private boolean federationApproval;
 
-
-
-    public Collectivity(String id, String name, String location, String specialty, boolean federationApproval) {
+    // Updated constructor
+    public Collectivity(String id, String number, String name, String location, String specialty, boolean federationApproval) {
         this.id = id;
+        this.number = number;
         this.name = name;
         this.location = location;
         this.specialty = specialty;
         this.federationApproval = federationApproval;
     }
 
+    public String getId() { return id; }
+    public Collectivity setId(String id) { this.id = id; return this; }
 
-    public String getId() {
-        return id;
-    }
+    public String getNumber() { return number; }
+    public Collectivity setNumber(String number) { this.number = number; return this; }
 
-    public Collectivity setId(String id) {
-        this.id = id;
-        return this;
-    }
+    public String getName() { return name; }
+    public Collectivity setName(String name) { this.name = name; return this; }
 
-    public String getName() {
-        return name;
-    }
+    public String getLocation() { return location; }
+    public Collectivity setLocation(String location) { this.location = location; return this; }
 
-    public Collectivity setName(String name) {
-        this.name = name;
-        return this;
-    }
+    public String getSpecialty() { return specialty; }
+    public Collectivity setSpecialty(String specialty) { this.specialty = specialty; return this; }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public Collectivity setLocation(String location) {
-        this.location = location;
-        return this;
-    }
-
-    public String getSpecialty() {
-        return specialty;
-    }
-
-    public Collectivity setSpecialty(String specialty) {
-        this.specialty = specialty;
-        return this;
-    }
-
-    public boolean isFederationApproval() {
-        return federationApproval;
-    }
-
-    public Collectivity setFederationApproval(boolean federationApproval) {
-        this.federationApproval = federationApproval;
-        return this;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Collectivity{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", location='" + location + '\'' +
-                ", specialty='" + specialty + '\'' +
-                ", federationApproval=" + federationApproval +
-                '}';
-    }
+    public boolean isFederationApproval() { return federationApproval; }
+    public Collectivity setFederationApproval(boolean federationApproval) { this.federationApproval = federationApproval; return this; }
 }
