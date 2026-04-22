@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 public class ApiController {
@@ -56,8 +59,20 @@ public class ApiController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
     }
 
+    @GetMapping("/collectivities/{id}/informations")
+    public ResponseEntity<?> getMethodName(@PathVariable String id) throws Exception{
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    }
+
+    @GetMapping("/collectivities/{id}/membershipFees")
+    public ResponseEntity<?> getMemberShipFees(@PathVariable String id) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    }
+    
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+
 }
