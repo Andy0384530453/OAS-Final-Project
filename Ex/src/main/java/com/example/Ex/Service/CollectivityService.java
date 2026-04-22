@@ -1,8 +1,10 @@
 package com.example.Ex.Service;
 
+import com.example.Ex.DTO.CollectivityTransactionDTO;
 import com.example.Ex.DTO.CreateCollectivity;
 import com.example.Ex.DTO.CreateCollectivityStructure;
 import com.example.Ex.Entity.Collectivity;
+import com.example.Ex.Entity.CollectivityTransaction;
 import com.example.Ex.Repository.CollectivityRepository;
 import com.example.Ex.Repository.CollectivityStructureRepository;
 import com.example.Ex.Repository.MemberRepository;
@@ -101,5 +103,28 @@ public class CollectivityService {
         collectivityRepository.assignNumberAndName(id, number, name);
 
         return collectivityRepository.findByIdWithDetails(id);
+    }
+
+    public List<CollectivityTransactionDTO> getTransactions(String id, String from, String to) throws Exception {
+        Collectivity existing = collectivityRepository.findByIdWithDetails(id);
+        if (existing == null) {
+            throw new RuntimeException("Collectivity not found");
+        }
+
+        List<CollectivityTransaction> transactions =
+                transactionRepository.findByCollectivityIdAndDateRange(id, from, to);
+
+        List<CollectivityTransactionDTO> result = new ArrayList<>();
+        for (CollectivityTransaction tx : transactions) {
+            CollectivityTransactionDTO dto = new CollectivityTransactionDTO();
+            dto.setId(tx.getId());
+            dto.setCreationDate(tx.getCreationDate());
+            dto.setAmount(tx.getAmount());
+            dto.setPaymentMode(tx.getPaymentMode());
+            dto.setAccountCredited(financialAccountRepository.findById(tx.getAccountCreditedId()));
+            dto.setMemberDebited(memberRepository.findById(tx.getMemberDebitedId()));
+            result.add(dto);
+        }
+        return result;
     }
 }

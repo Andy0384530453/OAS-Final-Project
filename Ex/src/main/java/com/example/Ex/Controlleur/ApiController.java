@@ -1,12 +1,12 @@
 package com.example.Ex.Controlleur;
 
-import com.example.Ex.DTO.AssignRequest;
-import com.example.Ex.DTO.CreateCollectivity;
-import com.example.Ex.DTO.CreateMember;
+import com.example.Ex.DTO.*;
 import com.example.Ex.Entity.Collectivity;
 import com.example.Ex.Entity.Member;
 import com.example.Ex.Service.CollectivityService;
+import com.example.Ex.Service.MemberPaymentService;
 import com.example.Ex.Service.MemberService;
+import com.example.Ex.Service.MembershipFeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,20 +59,48 @@ public class ApiController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
     }
 
-    @GetMapping("/collectivities/{id}/informations")
-    public ResponseEntity<?> getMethodName(@PathVariable String id) throws Exception{
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    private final MembershipFeeService membershipFeeService;
+    private final MemberPaymentService memberPaymentService;
+
+    public ApiController(CollectivityService collectivityService,
+                         MemberService memberService,
+                         MembershipFeeService membershipFeeService,
+                         MemberPaymentService memberPaymentService) {
+        this.collectivityService = collectivityService;
+        this.memberService = memberService;
+        this.membershipFeeService = membershipFeeService;
+        this.memberPaymentService = memberPaymentService;
     }
 
     @GetMapping("/collectivities/{id}/membershipFees")
-    public ResponseEntity<?> getMemberShipFees(@PathVariable String id) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    public ResponseEntity<?> getMembershipFees(@PathVariable String id) throws Exception {
+        List<MembershipFeeDTO> fees = membershipFeeService.getMembershipFees(id);
+        return ResponseEntity.ok(fees);
     }
-    
-    
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+
+    @PostMapping("/collectivities/{id}/membershipFees")
+    public ResponseEntity<?> createMembershipFees(
+            @PathVariable String id,
+            @RequestBody List<CreateMembershipFeeDTO> fees) throws Exception {
+        List<MembershipFeeDTO> result = membershipFeeService.createMembershipFees(id, fees);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/collectivities/{id}/transactions")
+    public ResponseEntity<?> getTransactions(
+            @PathVariable String id,
+            @RequestParam String from,
+            @RequestParam String to) throws Exception {
+        List<CollectivityTransactionDTO> result = collectivityService.getTransactions(id, from, to);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/members/{id}/payments")
+    public ResponseEntity<?> createMemberPayments(
+            @PathVariable String id,
+            @RequestBody List<CreateMemberPaymentDTO> payments) throws Exception {
+        List<MemberPaymentDTO> result = memberPaymentService.createPayments(id, payments);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
 }
