@@ -1,10 +1,12 @@
 package com.example.Ex.Repository;
 
 import com.example.Ex.DBConnection;
+import com.example.Ex.Entity.CollectivityStructure;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Repository
@@ -41,5 +43,28 @@ public class CollectivityStructureRepository {
             ps.setString(5, secretaryId);
             ps.executeUpdate();
         }
+    }
+    public CollectivityStructure findByCollectivityId(String collectivityId) throws SQLException {
+        String sql = "SELECT collectivity_id, president_id, vice_president_id, treasurer_id, secretary_id " +
+                "FROM collectivity_structures WHERE collectivity_id = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, collectivityId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    CollectivityStructure structure = new CollectivityStructure(
+                            rs.getString("collectivity_id"),
+                            rs.getString("president_id"),
+                            rs.getString("vice_president_id"),
+                            rs.getString("treasurer_id"),
+                            rs.getString("secretary_id"),
+                            0
+                    );
+                    return structure;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -15,18 +15,31 @@ public class DBConnection {
     private final String mdp;
 
     public DBConnection() {
-         Dotenv dotenv = Dotenv.configure()
-                .directory(System.getProperty("user.dir")) 
-                .filename(".env") 
+        Dotenv dotenv = Dotenv.configure()
+                .directory("./")
                 .ignoreIfMissing()
                 .load();
 
-        this.url  = dotenv.get("URL","jdbc:postgresql://localhost:5432/federation_collectivities_agricultural");
-        this.user = dotenv.get("USER","postgres");
-        this.mdp  = dotenv.get("MDP","ntsoa");
+        this.url = dotenv.get("URL");
+        this.user = dotenv.get("USER");
+        this.mdp = dotenv.get("MDP");
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getMdp() {
+        return mdp;
     }
 
     public Connection getDBConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:postgresql://localhost:5432/federation_collectivities_agricultural", "postgres", "ntsoa");
+        return DriverManager.getConnection(url, user, mdp);
     }
+
+
 }

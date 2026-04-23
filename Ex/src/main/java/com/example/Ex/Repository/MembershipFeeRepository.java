@@ -40,47 +40,49 @@ public class MembershipFeeRepository {
             ps.executeBatch();
         }
     }
-
     public List<MembershipFee> findByCollectivityId(String collectivityId) throws SQLException {
         List<MembershipFee> fees = new ArrayList<>();
-        String sql = "SELECT * FROM membership_fees WHERE collectivity_id = ?";
+
+        String sql = "SELECT id, collectivity_id, eligible_from, frequency, amount, label, status FROM membership_fees WHERE collectivity_id = ? ORDER BY eligible_from DESC";
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, collectivityId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    fees.add(new MembershipFee(
-                            rs.getString("id"),
-                            rs.getString("collectivity_id"),
-                            rs.getDate("eligible_from") != null ? rs.getDate("eligible_from").toString() : null,
-                            rs.getString("frequency"),
-                            rs.getDouble("amount"),
-                            rs.getString("label"),
-                            rs.getString("status")
-                    ));
+                    MembershipFee fee = new MembershipFee();
+                    fee.setId(rs.getString("id"));
+                    fee.setCollectivityId(rs.getString("collectivity_id"));
+                    fee.setEligibleFrom(rs.getDate("eligible_from") != null ? rs.getDate("eligible_from").toString() : null);
+                    fee.setFrequency(rs.getString("frequency"));
+                    fee.setAmount(rs.getDouble("amount"));
+                    fee.setLabel(rs.getString("label"));
+                    fee.setStatus(rs.getString("status"));
+                    fees.add(fee);
                 }
             }
         }
         return fees;
     }
 
+
     public MembershipFee findById(String id) throws SQLException {
         String sql = "SELECT id, collectivity_id, eligible_from, frequency, amount, label, status FROM membership_fees WHERE id = ?";
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, id);
-            MembershipFee membershipFee = new MembershipFee();       
-                            
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+                    MembershipFee membershipFee = new MembershipFee();
                     membershipFee.setId(rs.getString("id"));
                     membershipFee.setCollectivityId(rs.getString("collectivity_id"));
                     membershipFee.setEligibleFrom(rs.getDate("eligible_from") != null ? rs.getDate("eligible_from").toString() : null);
                     membershipFee.setFrequency(rs.getString("frequency"));
                     membershipFee.setAmount(rs.getDouble("amount"));
-                    membershipFee.setLabel(rs.getString("status"));
-                    
+                    membershipFee.setLabel(rs.getString("label"));
+                    membershipFee.setStatus(rs.getString("status"));
+
+
                     return membershipFee;
                 }
             }

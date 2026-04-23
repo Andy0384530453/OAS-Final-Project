@@ -63,4 +63,40 @@ public class MemberPaymentRepository {
         }
         return payments;
     }
+
+
+    public List<MemberPayment> findByAccountIdUntilDate(
+            String accountId, String atDate) throws SQLException {
+
+        List<MemberPayment> payments = new ArrayList<>();
+        String sql = """
+        SELECT id, member_id, amount, payment_mode,
+               account_credited_id, creation_date, membership_fee_id
+        FROM member_payments
+        WHERE account_credited_id = ?
+        AND creation_date <= ?
+    """;
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, accountId);
+            ps.setDate(2, Date.valueOf(atDate));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    MemberPayment payment = new MemberPayment(
+                            rs.getString("id"),
+                            rs.getString("member_id"),
+                            rs.getInt("amount"),
+                            rs.getString("payment_mode"),
+                            rs.getString("account_credited_id"),
+                            rs.getDate("creation_date") != null
+                                    ? rs.getDate("creation_date").toString() : null,
+                            rs.getString("membership_fee_id")
+                    );
+                    payments.add(payment);
+                }
+            }
+        }
+        return payments;
+    }
 }

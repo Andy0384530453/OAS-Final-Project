@@ -31,6 +31,7 @@ public class MemberService {
     }
 
     private Member createSingleMember(CreateMember dto) throws Exception {
+
         if (!dto.isRegistrationFeePaid() || !dto.isMembershipDuesPaid()) {
             throw new RuntimeException("Registration fee or membership dues not paid");
         }
@@ -43,21 +44,20 @@ public class MemberService {
 
         String id = generateId();
 
-        Member member = new Member(
-                id,
-                dto.getFirstName(),
-                dto.getLastName(),
-                dto.getBirthDate(),
-                dto.getGender(),
-                dto.getAddress(),
-                dto.getProfession(),
-                dto.getPhoneNumber(),
-                dto.getEmail(),
-                dto.getOccupation(),
-                dto.isRegistrationFeePaid(),
-                dto.isMembershipDuesPaid(),
-                dto.getCollectivityIdentifier()
-        );
+        Member member = new Member();
+        member.setId(id);
+        member.setFirstName(dto.getFirstName());
+        member.setLastName(dto.getLastName());
+        member.setBirthDate(dto.getBirthDate());
+        member.setGender(dto.getGender());
+        member.setAddress(dto.getAddress());
+        member.setProfession(dto.getProfession());
+        member.setPhoneNumber(dto.getPhoneNumber());
+        member.setEmail(dto.getEmail());
+        member.setOccupation(dto.getOccupation());
+        member.setRegistrationFeePaid(dto.isRegistrationFeePaid());
+        member.setMembershipDuesPaid(dto.isMembershipDuesPaid());
+        member.setCollectivityId(dto.getCollectivityIdentifier());
 
         memberRepository.createMember(member);
 

@@ -98,7 +98,8 @@ public class CollectivityMemberShipFee{
     }
 
     public MembershipFee findById(String id) throws SQLException {
-        String sql = "SELECT id, collectivity_id, eligible_from, frequency, amount, label, status  FROM membership_fees  FROM membership_fees WHERE id = ?";
+        String sql = "SELECT id, collectivity_id, eligible_from, frequency, amount, " +
+                "label, status FROM membership_fees WHERE id = ?";
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

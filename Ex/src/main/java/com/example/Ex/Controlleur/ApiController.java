@@ -2,6 +2,7 @@ package com.example.Ex.Controlleur;
 
 import com.example.Ex.DTO.*;
 import com.example.Ex.Entity.Collectivity;
+import com.example.Ex.Entity.FinancialAccount;
 import com.example.Ex.Entity.Member;
 import com.example.Ex.Service.CollectivityService;
 import com.example.Ex.Service.MemberPaymentService;
@@ -13,25 +14,24 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 public class ApiController {
 
     private final CollectivityService collectivityService;
     private final MemberService memberService;
-
-        private final MembershipFeeService membershipFeeService;
+    private final MembershipFeeService membershipFeeService;
     private final MemberPaymentService memberPaymentService;
 
+
     public ApiController(CollectivityService collectivityService,
-    MemberService memberService, MembershipFeeService membershipFeeService, MemberPaymentService memberPaymentService) {
+                         MemberService memberService,
+                         MembershipFeeService membershipFeeService,
+                         MemberPaymentService memberPaymentService) {
         this.collectivityService = collectivityService;
         this.memberService = memberService;
         this.membershipFeeService = membershipFeeService;
         this.memberPaymentService = memberPaymentService;
     }
-
-
 
     @PostMapping("/collectivities")
     public ResponseEntity<List<Collectivity>> createCollectivities(@RequestBody List<CreateCollectivity> collectivities) throws Exception {
@@ -45,27 +45,13 @@ public class ApiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @PutMapping("/collectivities/{id}/attribution")
+    @PutMapping("/collectivities/{id}/informations")
     public ResponseEntity<Collectivity> assignNumberAndName(
             @PathVariable String id,
             @RequestBody AssignRequest request) throws Exception {
         Collectivity result = collectivityService.assignNumberAndName(id, request.getNumber(), request.getName());
         return ResponseEntity.ok(result);
     }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntime(RuntimeException e) {
-        String msg = e.getMessage();
-        if (msg != null && msg.contains("not found")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
-        }
-        if (msg != null && (msg.contains("already has") || msg.contains("already exists"))) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
-    }
-
-
 
     @GetMapping("/collectivities/{id}/membershipFees")
     public ResponseEntity<?> getMembershipFees(@PathVariable String id) throws Exception {
@@ -98,4 +84,31 @@ public class ApiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
+    @GetMapping("/collectivities/{id}")
+    public ResponseEntity<?> getCollectivityById(@PathVariable String id) throws Exception {
+        CollectivityDTO result = collectivityService.getCollectivityById(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/collectivities/{id}/financialAccounts")
+    public ResponseEntity<?> getFinancialAccounts(
+            @PathVariable String id,
+            @RequestParam String at) throws Exception {
+        List<FinancialAccount> result = collectivityService.getFinancialAccounts(id, at);
+        return ResponseEntity.ok(result);
+    }
+
+
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntime(RuntimeException e) {
+        String msg = e.getMessage();
+        if (msg != null && msg.contains("not found")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
+        }
+        if (msg != null && (msg.contains("already has") || msg.contains("already exists"))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+    }
 }

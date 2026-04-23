@@ -24,16 +24,18 @@ public class CollectivityRepository {
 
 
 
-
-    public void createCollectivity(String location, boolean federationApproval) throws Exception {
-        String sql = "INSERT INTO collectivities (id, location, federation_approval) VALUES (UUID(), ?, ?)";
+    public String createCollectivity(String location, boolean federationApproval) throws Exception {
+        String id = java.util.UUID.randomUUID().toString();
+        String sql = "INSERT INTO collectivities (id, location, federation_approval) VALUES (?, ?, ?)";
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, location);
-            ps.setBoolean(2, federationApproval);
+            ps.setString(1, id);
+            ps.setString(2, location);
+            ps.setBoolean(3, federationApproval);
             ps.executeUpdate();
         }
+        return id;
     }
 
     public boolean existsByNumber(String number) throws SQLException {
@@ -87,7 +89,8 @@ public class CollectivityRepository {
     }
 
     public Collectivity findByIdWithDetails(String id) throws SQLException {
-        String sql = "SELECT id, number, name, location, federation_approval FROM collectivities WHERE id = ?";
+        String sql = "SELECT id, number, name, location, specialty, federation_approval " +
+                "FROM collectivities WHERE id = ?";
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, id);

@@ -1,0 +1,193 @@
+openapi: 3.1.0
+info:
+  title: Agricultural federation API
+  version: 0.0.1
+servers:
+  - url: 'https://localhost:8080'
+paths:
+  "/collectivities/{id}":
+    get:
+      summary: Get collectivity by its identifiant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description:  Collectivity with id={id}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collectivity'
+        '404':
+          description: Collectivity not found
+
+  '/collectivities/{id}/financialAccounts':
+    get:
+      summary: get the lists of accounts in a specific Collectivity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: at
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: All account in collectivity {name}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialAccount'
+        '400':
+          description: Provided query parameters occur some exceptions
+        '404':
+          description: Collectivity not found
+
+components:
+  schemas:
+    CollectivityInformation:
+      type: object
+      properties:
+        name:
+          type: string
+        number:
+          type: integer
+    Collectivity:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CollectivityInformation"
+      properties:
+        id:
+          type: string
+        location:
+          type: string
+        Members:
+          type: array
+          items:
+            $ref: "#/components/schemas/Members"
+    MembersIdentifier:
+      type: string
+    Members :
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/MemberInformation'
+    MemberInformation:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        gender:
+          $ref: '#/components/schemas/Gender'
+        address:
+          type: string
+        profession:
+          type: string
+        phoneNumber:
+          type: integer
+        email:
+          type: string
+        occupation:
+          $ref: '#/components/schemas/MemberOccupation'
+    Gender:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
+    MemberOccupation:
+      type: string
+      enum:
+        - JUNIOR
+        - SENIOR
+        - SECRETARY
+        - TREASURER
+        - VICE_PRESIDENT
+        - PRESIDENT
+    FinancialAccount:
+      oneOf:
+        - $ref: '#/components/schemas/CashAccount'
+        - $ref: '#/components/schemas/MobileBankingAccount'
+        - $ref: '#/components/schemas/BankAccount'
+      properties:
+        balance:
+          type: number
+    CashAccount:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: integer
+    MobileBankingAccount:
+      type: object
+      properties:
+        id:
+          type: string
+        holderName:
+          type: string
+        mobileBankingService:
+          $ref: '#/components/schemas/MobileBankingService'
+        mobileNumber:
+          type: integer
+        amount:
+          type: number
+    BankAccount:
+      type: object
+      properties:
+        id:
+          type: string
+        holderName:
+          type:
+            string
+        bankName:
+          $ref: '#/components/schemas/Bank'
+        bankCode:
+          type: integer
+        bankBranchCode:
+          type: integer
+        bankAccountNumber:
+          type: integer
+        bankAccountKey:
+          type: integer
+        amount:
+          type: number
+    MobileBankingService:
+      type: string
+      enum:
+        - AIRTEL_MONEY
+        - MVOLA
+        - ORANGE_MONEY
+    Bank:
+      type: string
+      enum:
+        - BRED
+        - MCB
+        - BMOI
+        - BOA
+        - BGFI
+        - AFG
+        - ACCES_BAQUE
+        - BAOBAB
+        - SIPEM
+
+
+
+
+
+
+
+
+
+
+

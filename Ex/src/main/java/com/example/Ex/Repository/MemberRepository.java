@@ -5,7 +5,9 @@ import com.example.Ex.Entity.Member;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Repository
 public class MemberRepository {
@@ -22,8 +24,7 @@ public class MemberRepository {
 
     public Member createMember(Member m) throws SQLException {
         String sql = """
-            INSERT INTO members
-            (id, first_name, last_name, birth_date, gender, address,
+            INSERT INTO members (id, first_name, last_name, birth_date, gender, address,
              profession, phone_number, email, occupation,
              registration_fee_paid, membership_dues_paid, collectivity_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -35,7 +36,7 @@ public class MemberRepository {
             ps.setString(1, m.getId());
             ps.setString(2, m.getFirstName());
             ps.setString(3, m.getLastName());
-            ps.setDate(4, Date.valueOf(m.getBirthDate()));
+            ps.setDate(4, m.getBirthDate() != null ? Date.valueOf(m.getBirthDate()) : null);
             ps.setString(5, m.getGender());
             ps.setString(6, m.getAddress());
             ps.setString(7, m.getProfession());
@@ -53,8 +54,9 @@ public class MemberRepository {
     }
 
     public Member findById(String id) throws SQLException {
-        String sql = "SELECT id, first_name, last_name, birth_date, gender, address, profession, email, occupation, registration_fee_paid, membership_dues_paid, collectivity_id FROM members WHERE id = ?";
-
+        String sql = "SELECT id, first_name, last_name, birth_date, gender, address, profession, phone_number, email, " +
+                "occupation, registration_fee_paid, " +
+                "membership_dues_paid, collectivity_id FROM members WHERE id = ?";
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -62,36 +64,33 @@ public class MemberRepository {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Member(
-                            rs.getString("id"),
-                            rs.getString("first_name"),
-                            rs.getString("last_name"),
-                            rs.getDate("birth_date") != null ? rs.getDate("birth_date").toString() : null,
-                            rs.getString("gender"),
-                            rs.getString("address"),
-                            rs.getString("profession"),
-                            rs.getString("phone_number"),
-                            rs.getString("email"),
-                            rs.getString("occupation"),
-                            rs.getBoolean("registration_fee_paid"),
-                            rs.getBoolean("membership_dues_paid"),
-                            rs.getString("collectivity_id")
-                    );
+                    Member m = new Member();
+                    m.setId(rs.getString("id"));
+                    m.setFirstName(rs.getString("first_name"));
+                    m.setLastName(rs.getString("last_name"));
+                    Date birthDate = rs.getDate("birth_date");
+                    m.setBirthDate(birthDate != null ? birthDate.toString() : null);
+                    m.setGender(rs.getString("gender"));
+                    m.setAddress(rs.getString("address"));
+                    m.setProfession(rs.getString("profession"));
+                    m.setPhoneNumber(rs.getString("phone_number"));
+                    m.setEmail(rs.getString("email"));
+                    m.setOccupation(rs.getString("occupation"));
+                    m.setRegistrationFeePaid(rs.getBoolean("registration_fee_paid"));
+                    m.setMembershipDuesPaid(rs.getBoolean("membership_dues_paid"));
+                    m.setCollectivityId(rs.getString("collectivity_id"));
+                    return m;
                 }
             }
         }
-
         return null;
     }
 
     public boolean existsMember(String id) throws SQLException {
         String sql = "SELECT id FROM members WHERE id = ?";
-
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setString(1, id);
-
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
@@ -102,40 +101,58 @@ public class MemberRepository {
         if (ids == null || ids.isEmpty()) {
             return true;
         }
-
-        String sql = "SELECT id FROM members WHERE id = ?";
-
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            for (String id : ids) {
-                ps.setString(1, id);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (!rs.next()) {
-                        return false;
-                    }
-                }
+        for (String id : ids) {
+            if (!existsMember(id)) {
+                return false;
             }
         }
-
         return true;
     }
 
     public void saveReferees(String memberId, List<String> referees) throws SQLException {
         if (referees == null || referees.isEmpty()) return;
 
-        String sql = "INSERT INTO member_referees(member_id, referee_id) VALUES (?, ?)";
+        String sql = "INSERT INTO member_referees (member_id, referee_id) VALUES (?, ?)";
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             for (String ref : referees) {
                 ps.setString(1, memberId);
                 ps.setString(2, ref);
                 ps.addBatch();
             }
-
             ps.executeBatch();
         }
+    }
+
+    public List<Member> findByCollectivityId(String collectivityId) throws SQLException {
+        List<Member> members = new ArrayList<>();
+        String sql = "SELECT * FROM members WHERE collectivity_id = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, collectivityId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Member m = new Member();
+                    m.setId(rs.getString("id"));
+                    m.setFirstName(rs.getString("first_name"));
+                    m.setLastName(rs.getString("last_name"));
+                    Date birthDate = rs.getDate("birth_date");
+                    m.setBirthDate(birthDate != null ? birthDate.toString() : null);
+                    m.setGender(rs.getString("gender"));
+                    m.setAddress(rs.getString("address"));
+                    m.setProfession(rs.getString("profession"));
+                    m.setPhoneNumber(rs.getString("phone_number"));
+                    m.setEmail(rs.getString("email"));
+                    m.setOccupation(rs.getString("occupation"));
+                    m.setRegistrationFeePaid(rs.getBoolean("registration_fee_paid"));
+                    m.setMembershipDuesPaid(rs.getBoolean("membership_dues_paid"));
+                    m.setCollectivityId(rs.getString("collectivity_id"));
+                    members.add(m);
+                }
+            }
+        }
+        return members;
     }
 }

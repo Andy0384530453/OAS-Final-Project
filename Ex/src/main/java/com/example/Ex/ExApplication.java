@@ -12,14 +12,6 @@ public class ExApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ExApplication.class, args);
-		DBConnection db = new DBConnection();
-
-		try (Connection c = db.getDBConnection()) {
-			System.out.println("Successfully");
-
-		} catch (SQLException e) {
-			System.out.println("error");
-		}
 	}
 
 }

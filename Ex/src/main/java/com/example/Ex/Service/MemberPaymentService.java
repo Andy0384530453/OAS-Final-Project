@@ -67,12 +67,10 @@ public class MemberPaymentService {
             );
             paymentsToSave.add(payment);
 
-            // Update account balance
             double newAmount = account.getAmount() + dto.getAmount();
             financialAccountRepository.updateAccountAmount(account.getId(), newAmount);
             account.setAmount(newAmount);
 
-            // Auto-create collectivity transaction
             CollectivityTransaction transaction = new CollectivityTransaction(
                     UUID.randomUUID().toString(),
                     fee.getCollectivityId(),
@@ -84,7 +82,6 @@ public class MemberPaymentService {
             );
             transactionRepository.createTransaction(transaction);
 
-            // Build DTO
             MemberPaymentDTO responseDTO = new MemberPaymentDTO();
             responseDTO.setId(paymentId);
             responseDTO.setAmount(dto.getAmount());

@@ -1,14 +1,8 @@
 package com.example.Ex.Service;
 
-import com.example.Ex.DTO.CollectivityTransactionDTO;
-import com.example.Ex.DTO.CreateCollectivity;
-import com.example.Ex.DTO.CreateCollectivityStructure;
-import com.example.Ex.Entity.Collectivity;
-import com.example.Ex.Entity.CollectivityTransaction;
-import com.example.Ex.Repository.CollectivityRepository;
-import com.example.Ex.Repository.CollectivityTransactionRepository;
-import com.example.Ex.Repository.FinancialAccountRepository;
-import com.example.Ex.Repository.MemberRepository;
+import com.example.Ex.DTO.*;
+import com.example.Ex.Entity.*;
+import com.example.Ex.Repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,19 +12,29 @@ import java.util.List;
 public class CollectivityService {
 
     private final CollectivityRepository collectivityRepository;
-    private final FinancialAccountRepository financialAccountRepository;
+    private final CollectivityStructureRepository structureRepository;
     private final MemberRepository memberRepository;
-    private final CollectivityTransactionRepository collectivityTransactionRepository;
+    private final CollectivityTransactionRepository transactionRepository;
+    private final FinancialAccountRepository financialAccountRepository;
+    private final MemberPaymentRepository memberPaymentRepository; // NOUVEAU
 
     public CollectivityService(
             CollectivityRepository collectivityRepository,
-            MemberRepository memberRepository, FinancialAccountRepository financialAccountRepository, CollectivityTransactionRepository collectivityTransactionRepository
+            CollectivityStructureRepository structureRepository,
+            MemberRepository memberRepository,
+            CollectivityTransactionRepository transactionRepository,
+            FinancialAccountRepository financialAccountRepository,
+            MemberPaymentRepository memberPaymentRepository  // NOUVEAU
     ) {
         this.collectivityRepository = collectivityRepository;
-        this.financialAccountRepository = financialAccountRepository;
+        this.structureRepository = structureRepository;
         this.memberRepository = memberRepository;
-        this.collectivityTransactionRepository = collectivityTransactionRepository;
+        this.transactionRepository = transactionRepository;
+        this.financialAccountRepository = financialAccountRepository;
+        this.memberPaymentRepository = memberPaymentRepository; // NOUVEAU
     }
+
+
 
     public List<Collectivity> createCollectivities(List<CreateCollectivity> collectivities) throws Exception {
         List<Collectivity> result = new ArrayList<>();
@@ -62,10 +66,11 @@ public class CollectivityService {
         validateMembersExist(dto.getMembers());
         validateStructureMembersExist(presidentId, vicePresidentId, treasurerId, secretaryId);
 
+        String collectivityId = collectivityRepository.createCollectivity(dto.getLocation(), dto.isFederationApproval());
 
-        collectivityRepository.createCollectivity(dto.getLocation(), dto.isFederationApproval());
+        structureRepository.createStructure(collectivityId, presidentId, vicePresidentId, treasurerId, secretaryId);
 
-        return new Collectivity(null, null, null, dto.getLocation(), null, dto.isFederationApproval());
+        return new Collectivity(collectivityId, null, null, dto.getLocation(), null, dto.isFederationApproval());
     }
 
     private void validateMembersExist(List<String> memberIds) throws Exception {
@@ -113,7 +118,8 @@ public class CollectivityService {
             throw new RuntimeException("Collectivity not found");
         }
 
-        List<CollectivityTransaction> transactions = collectivityTransactionRepository.findByCollectivityIdAndDateRange(id, from, to);
+        List<CollectivityTransaction> transactions =
+                transactionRepository.findByCollectivityIdAndDateRange(id, from, to);
 
         List<CollectivityTransactionDTO> result = new ArrayList<>();
         for (CollectivityTransaction tx : transactions) {
@@ -126,6 +132,77 @@ public class CollectivityService {
             dto.setMemberDebited(memberRepository.findById(tx.getMemberDebitedId()));
             result.add(dto);
         }
+        return result;
+    }
+
+    public CollectivityDTO getCollectivityById(String id) throws Exception {
+        Collectivity existing = collectivityRepository.findByIdWithDetails(id);
+        if (existing == null) {
+            throw new RuntimeException("Collectivity not found");
+        }
+
+
+        CollectivityStructure structure = structureRepository.findByCollectivityId(id);
+
+        CollectivityStructureDTO structureDTO = null;
+        if (structure != null) {
+            structureDTO = new CollectivityStructureDTO();
+            structureDTO.setPresident(memberRepository.findById(structure.getPresidentId()));
+            structureDTO.setVicePresident(memberRepository.findById(structure.getVicePresidentId()));
+            structureDTO.setTreasurer(memberRepository.findById(structure.getTreasurerId()));
+            structureDTO.setSecretary(memberRepository.findById(structure.getSecretaryId()));
+        }
+
+        List<Member> members = memberRepository.findByCollectivityId(id);
+
+        CollectivityDTO dto = new CollectivityDTO();
+        dto.setId(existing.getId());
+        dto.setNumber(existing.getNumber());
+        dto.setName(existing.getName());
+        dto.setLocation(existing.getLocation());
+        dto.setFederationApproval(existing.isFederationApproval());
+        dto.setStructure(structureDTO);
+        dto.setMembers(members);
+
+        return dto;
+    }
+
+    public List<FinancialAccount> getFinancialAccounts(String id, String at) throws Exception {
+
+
+        Collectivity existing = collectivityRepository.findByIdWithDetails(id);
+        if (existing == null) {
+            throw new RuntimeException("Collectivity not found");
+        }
+
+        try {
+            java.sql.Date.valueOf(at);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid date format, expected yyyy-MM-dd");
+        }
+        List<String> accountIds =
+                financialAccountRepository.findAccountIdsByCollectivityId(id);
+
+        List<FinancialAccount> result = new ArrayList<>();
+
+        for (String accountId : accountIds) {
+
+            FinancialAccount account = financialAccountRepository.findById(accountId);
+            if (account == null) continue;
+
+            List<MemberPayment> payments =
+                    memberPaymentRepository.findByAccountIdUntilDate(accountId, at);
+
+            double balanceAtDate = 0.0;
+            for (MemberPayment payment : payments) {
+                balanceAtDate += payment.getAmount();
+            }
+
+            account.setAmount(balanceAtDate);
+
+            result.add(account);
+        }
+
         return result;
     }
 }

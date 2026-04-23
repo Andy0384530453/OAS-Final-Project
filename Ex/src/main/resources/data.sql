@@ -121,3 +121,10 @@ CREATE TABLE collectivity_transactions (
     FOREIGN KEY (member_debited_id) REFERENCES members(id)
 );
 
+
+
+
+ALTER TABLE collectivities ADD COLUMN IF NOT EXISTS specialty VARCHAR(255);
+ALTER TABLE collectivities ADD COLUMN IF NOT EXISTS created_at DATE DEFAULT CURRENT_DATE;
+ALTER TABLE collectivities ADD COLUMN IF NOT EXISTS federation_id VARCHAR(255);
+
