@@ -121,7 +121,3 @@ CREATE TABLE collectivity_transactions (
     FOREIGN KEY (member_debited_id) REFERENCES members(id)
 );
 
-SELECT * from Members;
-SELECT  * FROM membership_fees ;
-
-SELECT id, collectivity_id, eligible_from, frequency, amount, label, status FROM membership_fees WHERE id = '84af4ce6-d039-4efb-b4b2-3c1b16ec9b9a';
