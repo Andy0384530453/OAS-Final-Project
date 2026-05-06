@@ -38,7 +38,7 @@ public class DBConnection {
     }
 
     public Connection getDBConnection() throws SQLException {
-        return DriverManager.getConnection(url, user, mdp);
+        return DriverManager.getConnection("jdbc:postgresql://localhost:5432/federation_collectivities_agricultural", "postgres", "ntsoa");
     }
 
 

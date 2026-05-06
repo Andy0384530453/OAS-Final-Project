@@ -8,6 +8,8 @@ import com.example.Ex.Service.CollectivityService;
 import com.example.Ex.Service.MemberPaymentService;
 import com.example.Ex.Service.MemberService;
 import com.example.Ex.Service.MembershipFeeService;
+import com.example.Ex.Service.StatisticServices;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,16 +23,18 @@ public class ApiController {
     private final MemberService memberService;
     private final MembershipFeeService membershipFeeService;
     private final MemberPaymentService memberPaymentService;
+    private final StatisticServices statisticService;
 
 
     public ApiController(CollectivityService collectivityService,
                          MemberService memberService,
                          MembershipFeeService membershipFeeService,
-                         MemberPaymentService memberPaymentService) {
+                         MemberPaymentService memberPaymentService, StatisticServices statisticServices) {
         this.collectivityService = collectivityService;
         this.memberService = memberService;
         this.membershipFeeService = membershipFeeService;
         this.memberPaymentService = memberPaymentService;
+        this.statisticService = statisticServices;
     }
 
     @PostMapping("/collectivities")
@@ -110,5 +114,15 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+    }
+
+    @GetMapping("/collectivities/{id}/statistics")
+    public ResponseEntity<?> getCollectivityMemberStatistic(
+        @PathVariable String id, 
+        @RequestParam String from, 
+        @RequestParam String to
+    ) throws Exception{
+        return ResponseEntity.accepted().body(statisticService.getCollectivityStatisticValid(id, from, to));
+
     }
 }
