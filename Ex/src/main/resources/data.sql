@@ -1,3 +1,4 @@
+-- Active: 1775829249217@@127.0.0.1@5432@federation_collectivities_agricultural
 
 CREATE DATABASE federation_collectivities_agricultural;
 \c federation_collectivities_agricultural;
@@ -121,10 +122,21 @@ CREATE TABLE collectivity_transactions (
     FOREIGN KEY (member_debited_id) REFERENCES members(id)
 );
 
-
-
-
 ALTER TABLE collectivities ADD COLUMN IF NOT EXISTS specialty VARCHAR(255);
 ALTER TABLE collectivities ADD COLUMN IF NOT EXISTS created_at DATE DEFAULT CURRENT_DATE;
 ALTER TABLE collectivities ADD COLUMN IF NOT EXISTS federation_id VARCHAR(255);
+
+SELECT SUM(mp.amount) FROM member_payments mp WHERE mp.member_id = ? AND creation_date BETWEEN ? AND ?;
+
+
+SELECT * from members GROUP BY id;
+
+
+SELECT SUM(mf.amount), mf.eligible_from  from membership_fees mf WHERE mf.collectivity_id = 'col-1' AND mf.status = 'ACTIVE' AND mf.eligible_from <= '2025-01-01' AND mf.id NOT IN (        
+    SELECT mp.membership_fee_id
+        FROM member_payments mp
+        WHERE mp.member_id = 'mem-10'
+        AND mp.creation_date BETWEEN '2024-01-02' AND '2025-01-03'
+        ) GROUP BY mf.eligible_from;
+SELECT * from members
 
